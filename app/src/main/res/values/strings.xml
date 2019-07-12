@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Hunger Valley</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="place_order">Once Order placed it cannot be cancelled because the restaurant starts preparing it as soon as they receive the order also Order cancellation may block your account!</string>
+
+</resources>
