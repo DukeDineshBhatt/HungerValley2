@@ -16,9 +16,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
     protected BottomNavigationView navigationView;
 
-    String uId;
-    private DatabaseReference mCartDatabase;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +23,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
         navigationView = (BottomNavigationView) findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(this);
-
-        SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
-        uId = (shared.getString("user_id", ""));
-
-        mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
     }
 
     @Override
@@ -54,13 +46,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
             if (itemId == R.id.restaurant) {
 
-
-                mCartDatabase.removeValue();
-
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
-
-                Toast.makeText(this, "Your Cart is refreshed!", Toast.LENGTH_SHORT).show();
-
 
             } else if (itemId == R.id.cart) {
                 startActivity(new Intent(this, CartActivity.class));

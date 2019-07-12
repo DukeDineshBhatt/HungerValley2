@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -208,17 +209,10 @@ public class AccountActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        AccountActivity.super.onBackPressed();
-
-        mCartDatabase.removeValue();
-
-        Toast.makeText(this, "Your Cart is refreshed!", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(AccountActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
-
-
 
 
     }

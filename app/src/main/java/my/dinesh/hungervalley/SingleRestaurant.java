@@ -727,6 +727,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
                 mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
 
+
                 mCartDatabase.removeValue();
 
                 return super.onOptionsItemSelected(item);
@@ -745,7 +746,8 @@ public class SingleRestaurant extends AppCompatActivity {
 
         Toast.makeText(this, "Your Cart is refreshed!", Toast.LENGTH_SHORT).show();
 
-        super.onBackPressed();
+        Intent intent = new Intent(SingleRestaurant.this, MainActivity.class);
+        startActivity(intent);
         finish();
 
 

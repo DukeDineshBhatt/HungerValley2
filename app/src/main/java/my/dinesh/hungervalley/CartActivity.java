@@ -243,7 +243,7 @@ public class CartActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
 
-        new AlertDialog.Builder(this)
+        /*new AlertDialog.Builder(this)
                 .setMessage("cart will be empty once you will change the restaurant!")
                 .setNegativeButton(android.R.string.no, null)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -258,8 +258,10 @@ public class CartActivity extends BaseActivity {
                         finish();
                     }
                 }).create().show();
-
-
+*/
+        Intent intent = new Intent(CartActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public boolean isNetworkConnectionAvailable() {
