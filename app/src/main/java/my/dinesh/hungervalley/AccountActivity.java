@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,8 +27,9 @@ public class AccountActivity extends BaseActivity {
     int flags;
     LinearLayout address;
     Button add_address, edit;
-    LinearLayout logout_layout;
+    LinearLayout logout_layout, share;
     DatabaseReference mCartDatabase;
+    TextView txt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +45,13 @@ public class AccountActivity extends BaseActivity {
         price = (TextView) findViewById(R.id.price);
         address = (LinearLayout) findViewById(R.id.address);
         add_address = (Button) findViewById(R.id.add_address);
+        share = (LinearLayout) findViewById(R.id.share);
         edit = (Button) findViewById(R.id.edit);
         btn_login = (Button) findViewById(R.id.btn_login);
         //delete_address = (Button) findViewById(R.id.delete);
         logout_layout = (LinearLayout) findViewById(R.id.logout_layout);
         order_layout = (LinearLayout) findViewById(R.id.order_layout);
+        txt = (TextView) findViewById(R.id.txt);
 
         flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
@@ -61,7 +63,6 @@ public class AccountActivity extends BaseActivity {
         SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         String userId = (shared.getString("user_id", ""));
 
-
         DatabaseReference mOrderDatabase = database.getReference("Orders List").child("User View").child(userId);
 
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(userId);
@@ -69,6 +70,26 @@ public class AccountActivity extends BaseActivity {
 
         DatabaseReference usersRef = database.getReference("Users").child(userId);
 
+
+       /* Typeface Hindi = Typeface.createFromAsset(getAssets(), "font/mangal.ttf");
+        txt.setTypeface(Hindi);
+        txt.setText("दगड़िया");*/
+
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareBody = "Try this Amazing App for Amazing Food." +
+                        " https://play.google.com/store/apps/details?id=my.dinesh.hungervalley";
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+            }
+        });
 
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -182,7 +203,7 @@ public class AccountActivity extends BaseActivity {
                                 editor.commit();
                                 editor1.commit();
 
-                                Intent intent = new Intent(AccountActivity.this, StartActivity.class);
+                                Intent intent = new Intent(AccountActivity.this, LoginActivity.class);
                                 startActivity(intent);
                                 finish();
 

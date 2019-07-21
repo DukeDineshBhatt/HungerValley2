@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity {
     private RecyclerView recyclerView;
     ProgressBar progressBar;
     private LinearLayoutManager linearLayoutManager;
-    private DatabaseReference mRestaurantDatabase, mImageDatabase, mCartDatabase,mSelectedDatabase;
+    private DatabaseReference mRestaurantDatabase, mImageDatabase, mCartDatabase, mSelectedDatabase;
     String uId;
 
     ImageView img1, img2, img3, img4, img5;
@@ -305,13 +305,8 @@ public class MainActivity extends BaseActivity {
                     });
 
 
-
-
-
                 }
             });
-
-
 
 
             img2.setOnClickListener(new View.OnClickListener() {
@@ -359,9 +354,6 @@ public class MainActivity extends BaseActivity {
 
                         }
                     });
-
-
-
 
 
                 }
@@ -415,9 +407,6 @@ public class MainActivity extends BaseActivity {
                     });
 
 
-
-
-
                 }
             });
 
@@ -469,9 +458,6 @@ public class MainActivity extends BaseActivity {
                     });
 
 
-
-
-
                 }
             });
 
@@ -521,9 +507,6 @@ public class MainActivity extends BaseActivity {
 
                         }
                     });
-
-
-
 
 
                 }
@@ -630,7 +613,13 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        //super.onBackPressed();
-        moveTaskToBack(true);
+        /*super.onBackPressed();
+        moveTaskToBack(true);*/
+
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
+        finish();
     }
 }

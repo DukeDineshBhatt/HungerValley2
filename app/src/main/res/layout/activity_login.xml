@@ -103,13 +103,14 @@
                 android:textAllCaps="false"
                 android:textColor="#cdd8f1" />
 
-        <!--    <TextView
+            <TextView
+                android:id="@+id/forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Forgot Password?"
                 android:layout_gravity="right"
-                android:id="@+id/forgot_password"
-                android:layout_marginTop="25dp"/>-->
+                android:layout_marginTop="25dp"
+                android:textStyle="bold"
+                android:text="Forgot Password?" />
 
         </LinearLayout>
     </LinearLayout>
