@@ -14,8 +14,8 @@ android {
         applicationId "my.dinesh.hungervalley"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.8"
+        versionCode 11
+        versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.MyConfig
     }
@@ -33,13 +33,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.firebaseui:firebase-ui-database:2.0.1'
     implementation 'com.ss.bannerslider:bannerslider:2.0.0'

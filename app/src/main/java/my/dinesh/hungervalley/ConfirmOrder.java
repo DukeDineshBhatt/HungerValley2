@@ -1,6 +1,7 @@
 package my.dinesh.hungervalley;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,13 +37,15 @@ public class ConfirmOrder extends AppCompatActivity {
     TextView to_pay, name, mobile, txt_location, txt_locality, txt_landmark, edit_address, mobile2;
     ProgressBar progressbar;
     Button place;
-    DatabaseReference mOrderDatabase, mAdminOrdreDatabase, mAdminDatabase;
+    DatabaseReference mOrderDatabase, mAdminOrdreDatabase, mAdminDatabase, mRestaurantDatabase;
 
     String pName, price, qty, s;
 
     String tempPrice;
+    boolean isDiscount = false;
 
     ArrayList<CartDataSetGet> list;
+    int discountPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +82,9 @@ public class ConfirmOrder extends AppCompatActivity {
         uId = (shared.getString("user_id", ""));
         restaurantId = (shared.getString("restaurant", ""));
 
+
+        mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(restaurantId);
+
         mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
 
         mOrderDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(uId).child(restaurantId);
@@ -93,22 +99,59 @@ public class ConfirmOrder extends AppCompatActivity {
 
         DatabaseReference usersRef = database.getReference("Users").child(uId);
 
+        mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.child("Discount").exists()) {
+
+                    isDiscount = true;
+
+                    discountPrice = Integer.parseInt(dataSnapshot.child("Discount").getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         mCartListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 progressbar.setVisibility(View.VISIBLE);
 
-                to_pay.setText(dataSnapshot.child("Total price").getValue().toString());
+                if (isDiscount) {
+
+                    to_pay.setText(dataSnapshot.child("Total price").getValue().toString());
+
+                    int a = Integer.parseInt(to_pay.getText().toString());
+
+                    fValue = a + 20;
+                    fValue = fValue - discountPrice;
+                    to_pay.setText(String.valueOf(fValue));
+
+                    progressbar.setVisibility(View.GONE);
 
 
-                int a = Integer.parseInt(to_pay.getText().toString());
+                } else {
 
-                fValue = a + 20;
+                    to_pay.setText(dataSnapshot.child("Total price").getValue().toString());
 
-                to_pay.setText(String.valueOf(fValue));
 
-                progressbar.setVisibility(View.GONE);
+                    int a = Integer.parseInt(to_pay.getText().toString());
+
+                    fValue = a + 20;
+
+                    to_pay.setText(String.valueOf(fValue));
+
+                    progressbar.setVisibility(View.GONE);
+
+                }
+
 
             }
 
@@ -199,14 +242,16 @@ public class ConfirmOrder extends AppCompatActivity {
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                         public void onClick(DialogInterface arg0, int arg1) {
-                                            ConfirmOrder.super.onBackPressed();
+
+                                            ProgressDialog dialog = ProgressDialog.show(ConfirmOrder.this, "",
+                                                    "Please wait...", true);
 
 
+                                            progressbar.setVisibility(View.VISIBLE);
                                             mCartListDatabase.child(restaurantId).addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                    progressbar.setVisibility(View.VISIBLE);
 
                                                     for (DataSnapshot uniqueKeySnapshot : dataSnapshot.getChildren()) {
 
@@ -270,9 +315,10 @@ public class ConfirmOrder extends AppCompatActivity {
 
                                                                                 progressbar.setVisibility(View.GONE);
 
+
                                                                                 Toast.makeText(ConfirmOrder.this, "Order has been placed successfully", Toast.LENGTH_LONG).show();
 
-                                                                                Intent intent = new Intent(ConfirmOrder.this, MainActivity.class);
+                                                                                Intent intent = new Intent(ConfirmOrder.this, AccountActivity.class);
                                                                                 startActivity(intent);
                                                                                 finish();
 
@@ -295,6 +341,7 @@ public class ConfirmOrder extends AppCompatActivity {
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                                                    progressbar.setVisibility(View.GONE);
                                                 }
                                             });
 
@@ -307,7 +354,7 @@ public class ConfirmOrder extends AppCompatActivity {
 
 
                             AlertDialog.Builder builder1 = new AlertDialog.Builder(ConfirmOrder.this);
-                            builder1.setMessage("Restaurant is closed!");
+                            builder1.setMessage("Currently not accepting orders!");
                             builder1.setCancelable(false);
 
                             builder1.setPositiveButton(

@@ -16,7 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toolbar;
@@ -31,26 +33,29 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import ss.com.bannerslider.Slider;
+import ss.com.bannerslider.adapters.SliderAdapter;
+import ss.com.bannerslider.viewholder.ImageSlideViewHolder;
 
 
 public class MainActivity extends BaseActivity {
 
     private Toolbar toolbar;
     public static final String PREFS_NAME = "MyPrefsFile";
-    private int mSelectedItem;
     private static final String SELECTED_ITEM = "arg_selected_item";
     Window window;
     int flags;
-
+    int mSelectedItem;
 
     private Slider slider;
     private RecyclerView recyclerView;
     ProgressBar progressBar;
     private LinearLayoutManager linearLayoutManager;
-    private DatabaseReference mRestaurantDatabase, mImageDatabase, mCartDatabase, mSelectedDatabase;
+    private DatabaseReference mRestaurantDatabase, mImageDatabase, mCartDatabase, mMainBannerDatabase;
     String uId;
 
     ImageView img1, img2, img3, img4, img5;
+
+    String banner1,banner2,banner3,banner4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,29 +96,51 @@ public class MainActivity extends BaseActivity {
         mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants");
         mRestaurantDatabase.keepSynced(true);
 
+
+
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View");
-
-        mSelectedDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants");
-
 
         mImageDatabase = FirebaseDatabase.getInstance().getReference().child("Main Images");
         mImageDatabase.keepSynced(true);
 
+        mMainBannerDatabase = FirebaseDatabase.getInstance().getReference().child("Main Banner");
+        mMainBannerDatabase.keepSynced(true);
 
-        Slider.init(new PicassoImageLoadingService(MainActivity.this));
 
-
-        slider = findViewById(R.id.banner_slider1);
-        slider.setAdapter(new MainSliderAdapter());
-
-        //delay for testing empty view functionality
-        slider.postDelayed(new Runnable() {
+        mMainBannerDatabase.addValueEventListener(new ValueEventListener() {
             @Override
-            public void run() {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                banner1 = dataSnapshot.child("Banner1").getValue().toString();
+                banner2 = dataSnapshot.child("Banner2").getValue().toString();
+                banner3 = dataSnapshot.child("Banner3").getValue().toString();
+                banner4 = dataSnapshot.child("Banner4").getValue().toString();
+
+
+                Slider.init(new PicassoImageLoadingService(MainActivity.this));
+
+
+                slider = findViewById(R.id.banner_slider1);
+
                 slider.setAdapter(new MainSliderAdapter());
 
+                //delay for testing empty view functionality
+                slider.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        slider.setAdapter(new MainSliderAdapter());
+
+                    }
+                }, 3000);
+
             }
-        }, 3000);
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
 
         linearLayoutManager = new LinearLayoutManager(MainActivity.this);
@@ -144,10 +171,36 @@ public class MainActivity extends BaseActivity {
                             final String name = dataSnapshot.child("Restaurant_name").getValue().toString();
                             final String type = dataSnapshot.child("Restaurant_type").getValue().toString();
                             final String image = dataSnapshot.child("Banner").getValue().toString();
+                            final String rating = dataSnapshot.child("Rating").getValue().toString();
+
+
+                            if (dataSnapshot.child("Discount").exists()){
+
+                                viewHolder.layout_discount.setVisibility(View.VISIBLE);
+
+
+                            }else {
+
+                                viewHolder.layout_discount.setVisibility(View.GONE);
+                            }
+
+                            float a = Float.parseFloat(rating);
+
+                            if (a>4.0){
+
+                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg);
+                            }else if (a>3.0){
+
+                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_two);
+                            }else {
+
+                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_three);
+                            }
 
                             viewHolder.setName(name);
                             viewHolder.setFrom(type);
                             viewHolder.setImage(image);
+                            viewHolder.rating.setText(rating);
 
                             viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -214,6 +267,7 @@ public class MainActivity extends BaseActivity {
             };
 
             recyclerView.setAdapter(friendsRecyclerView);
+
 
 
             mImageDatabase.addValueEventListener(new ValueEventListener() {
@@ -395,7 +449,6 @@ public class MainActivity extends BaseActivity {
                                 chatIntent.putExtra("restauranr_id", "Kaku Restaurant");
                                 startActivity(chatIntent);
 
-
                             }
 
                         }
@@ -411,7 +464,7 @@ public class MainActivity extends BaseActivity {
             });
 
 
-            img4.setOnClickListener(new View.OnClickListener() {
+            /*img4.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -460,7 +513,7 @@ public class MainActivity extends BaseActivity {
 
                 }
             });
-
+*/
 
             img5.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -571,12 +624,18 @@ public class MainActivity extends BaseActivity {
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
+        LinearLayout layout_discount,layout_rating;
+        TextView rating;
 
 
         public FriendsViewHolder(View itemView) {
             super(itemView);
 
             mView = itemView;
+
+            layout_discount = (LinearLayout) itemView.findViewById(R.id.layout_discount);
+            layout_rating = (LinearLayout) itemView.findViewById(R.id.layout_rating);
+            rating = (TextView) itemView.findViewById(R.id.rating);
 
         }
 
@@ -622,4 +681,39 @@ public class MainActivity extends BaseActivity {
         startActivity(a);
         finish();
     }
+
+
+    public class MainSliderAdapter extends SliderAdapter {
+
+
+        @Override
+        public int getItemCount() {
+            return 4;
+        }
+
+        @Override
+        public void onBindImageSlide(int position, ImageSlideViewHolder viewHolder) {
+            switch (position) {
+
+                case 0:
+                    viewHolder.bindImageSlide(banner1);
+                    break;
+                case 1:
+                    viewHolder.bindImageSlide(banner2);
+                    break;
+                case 2:
+                    viewHolder.bindImageSlide(banner3);
+                    break;
+
+                case 3:
+                    viewHolder.bindImageSlide(banner4);
+                    break;
+            }
+        }
+    }
+
+
+
 }
+
+

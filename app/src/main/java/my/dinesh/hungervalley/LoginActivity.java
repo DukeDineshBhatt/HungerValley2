@@ -55,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         editTextMobile = (EditText) findViewById(R.id.mobile);
         button_login = (Button) findViewById(R.id.button_login);
         progressbar = (ProgressBar) findViewById(R.id.progressbar);
+
         forgot_password = (TextView) findViewById(R.id.forgot_password);
 
 
@@ -141,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
 
         progressbar.setVisibility(View.GONE);
 
-        forgot_password.setOnClickListener(new View.OnClickListener() {
+      forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 

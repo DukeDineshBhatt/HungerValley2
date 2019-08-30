@@ -29,9 +29,9 @@ public class SignupActivity extends AppCompatActivity {
     int flags;
 
     EditText editTextMobile;
-    EditText editTextMobileConfrim, editTextUsername, editTextPassword;
+    EditText editTextMobileConfrim, editTextUsername, editTextPassword,editTextConfrmPassword;
 
-    String mobile, mobile_confrm, password, username;
+    String mobile, mobile_confrm, password, username,confrm_password;
     Button btn_continue;
     ProgressBar progressbar;
 
@@ -58,6 +58,7 @@ public class SignupActivity extends AppCompatActivity {
         editTextMobileConfrim = findViewById(R.id.mobile_confirm);
         editTextUsername = findViewById(R.id.username);
         editTextPassword = findViewById(R.id.password);
+        editTextConfrmPassword = findViewById(R.id.confrm_password);
         btn_continue = findViewById(R.id.buttonContinue);
         progressbar = findViewById(R.id.progressbar);
 
@@ -71,32 +72,44 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                progressbar.setVisibility(View.VISIBLE);
 
                 mobile = editTextMobile.getText().toString().trim();
                 mobile_confrm = editTextMobileConfrim.getText().toString().trim();
                 password = editTextPassword.getText().toString().trim();
                 username = editTextUsername.getText().toString().trim();
+                confrm_password = editTextConfrmPassword.getText().toString().trim();
 
                 if (username.isEmpty()) {
+                    progressbar.setVisibility(View.GONE);
 
                     editTextUsername.setError("Enter username");
                     editTextUsername.requestFocus();
                     return;
 
                 } else if (mobile.isEmpty() || mobile.length() < 10) {
+                    progressbar.setVisibility(View.GONE);
 
                     editTextMobile.setError("Enter a valid mobile number");
                     editTextMobile.requestFocus();
                     return;
                 } else if (!(mobile.equals(mobile_confrm))) {
+                    progressbar.setVisibility(View.GONE);
 
                     editTextMobileConfrim.setError("Enter Correct mobile number");
                     editTextMobileConfrim.requestFocus();
                     return;
                 } else if (password.isEmpty() || password.length() < 6) {
+                    progressbar.setVisibility(View.GONE);
 
-                    editTextPassword.setError("Enter your 6 digit password");
+                    editTextPassword.setError("Enter 6 digit password");
                     editTextPassword.requestFocus();
+
+                } else if (!(password.equals(confrm_password))) {
+                    progressbar.setVisibility(View.GONE);
+
+                    editTextConfrmPassword.setError("Password not matched");
+                    editTextConfrmPassword.requestFocus();
 
                 } else {
 
@@ -106,6 +119,7 @@ public class SignupActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot snapshot) {
                             if (snapshot.hasChild(mobile_confrm)) {
 
+                                progressbar.setVisibility(View.GONE);
 
                                 Toast.makeText(SignupActivity.this, "Account already exist with this mobile number!", Toast.LENGTH_LONG).show();
 
@@ -114,7 +128,7 @@ public class SignupActivity extends AppCompatActivity {
 
                             } else {
 
-                                progressbar.setVisibility(View.VISIBLE);
+
 
                                 SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
                                 SharedPreferences.Editor editor = mPrefs.edit();
@@ -131,7 +145,7 @@ public class SignupActivity extends AppCompatActivity {
 
                                 usersRef.child(userid).setValue(userMap);
 
-                                progressbar.setVisibility(View.GONE);
+
 
                                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                                 //intent.putExtra("mobile", mobile);
@@ -140,6 +154,7 @@ public class SignupActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
 
+                                progressbar.setVisibility(View.GONE);
 
                             }
                         }
@@ -147,6 +162,7 @@ public class SignupActivity extends AppCompatActivity {
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                            progressbar.setVisibility(View.GONE);
                         }
                     });
                 }

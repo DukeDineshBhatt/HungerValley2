@@ -17,6 +17,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ResetPasswordActivity"
+            android:parentActivityName=".ForgetPasswordActivity"></activity>
+
         <activity android:name=".ForgetPasswordActivity"
             android:parentActivityName=".LoginActivity"></activity>
         <activity
@@ -46,6 +49,7 @@
         </activity>
         <activity
             android:name=".SingleRestaurant"
+            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"

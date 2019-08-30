@@ -39,12 +39,12 @@ public class CartActivity extends BaseActivity {
     LinearLayout layout_empty;
     RelativeLayout layout;
     String uId, restaurantId;
-    int flags;
+    int flags, discount_int;
 
     DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase;
 
     MyAdapter adapter;
-    TextView restaurant, total_price, to_pay;
+    TextView restaurant, total_price, to_pay, discount;
 
     ArrayList<CartDataSetGet> list;
     Button place;
@@ -61,6 +61,7 @@ public class CartActivity extends BaseActivity {
         restaurant = (TextView) findViewById(R.id.restaurant);
         total_price = (TextView) findViewById(R.id.total_price);
         to_pay = (TextView) findViewById(R.id.to_pay);
+        discount = (TextView) findViewById(R.id.discount);
         place = (Button) findViewById(R.id.place);
         banner = (ImageView) findViewById(R.id.banner);
 
@@ -107,6 +108,7 @@ public class CartActivity extends BaseActivity {
                                     .with(getApplicationContext())
                                     .load(banner_url)
                                     .into(banner);
+
                         }
 
                         @Override
@@ -114,7 +116,6 @@ public class CartActivity extends BaseActivity {
 
                         }
                     });
-
 
                     linearLayoutManager = new LinearLayoutManager(CartActivity.this);
                     recyclerView.setLayoutManager(linearLayoutManager);
@@ -142,8 +143,34 @@ public class CartActivity extends BaseActivity {
 
                                         int a = Integer.parseInt(total_price.getText().toString());
                                         int f = a + 20;
-                                        to_pay.setText(String.valueOf(f));
 
+                                        mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                                if (dataSnapshot.child("Discount").exists()) {
+
+                                                    String s = dataSnapshot.child("Discount").getValue().toString();
+                                                    discount_int = Integer.parseInt(s);
+
+                                                    discount.setText(s);
+
+                                                    float final_Value = f - discount_int;
+
+                                                    to_pay.setText(String.valueOf(final_Value));
+
+                                                } else {
+
+                                                    to_pay.setText(String.valueOf(f));
+
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                            }
+                                        });
 
                                     }
 

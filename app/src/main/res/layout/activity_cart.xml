@@ -68,9 +68,9 @@
                         android:id="@+id/banner"
                         android:layout_width="55dp"
                         android:layout_height="55dp"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginLeft="12dp"
-                        android:scaleType="centerCrop"
-                        android:layout_gravity="center_vertical" />
+                        android:scaleType="centerCrop" />
 
                     <TextView
                         android:id="@+id/restaurant"
@@ -87,7 +87,7 @@
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/upload_list"
                     android:layout_width="match_parent"
-                    android:layout_height="250dp"
+                    android:layout_height="223dp"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="10dp">
 
@@ -143,13 +143,47 @@
 
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:layout_marginTop="12dp"
-                        android:background="#E4E2E2">
 
-                    </View>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:weightSum="2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Offers Discount"
+                            android:textColor="#388E3C" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical|right">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-"
+                                android:textColor="#388E3C"/>
+
+                            <ImageView
+                                android:layout_width="11dp"
+                                android:layout_height="11dp"
+                                android:src="@drawable/rupee" />
+
+                            <TextView
+                                android:id="@+id/discount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:textColor="#388E3C" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
 
                     <LinearLayout
@@ -230,6 +264,14 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginTop="10dp"
+                        android:background="#E4E2E2">
+
+                    </View>
 
 
                 </LinearLayout>
