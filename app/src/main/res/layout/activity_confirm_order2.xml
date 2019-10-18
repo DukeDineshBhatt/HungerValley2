@@ -199,6 +199,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginRight="12dp"
             android:layout_marginBottom="12dp"
+            android:textColor="@color/colorPrimary"
             android:text="@string/place_order"
             android:textSize="12dp" />
 
