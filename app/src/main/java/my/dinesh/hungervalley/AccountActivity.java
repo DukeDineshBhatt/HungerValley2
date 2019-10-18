@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -23,11 +24,11 @@ public class AccountActivity extends BaseActivity {
 
     Button btn_login;
     LinearLayout order_layout;
-    TextView textViewUsername, textViewPhone, txt_location, txt_locality, txt_landmark, price, no_order;
+    TextView textViewUsername, textViewPhone, txt_location, txt_locality, txt_landmark, price, no_order,mailText;
     int flags;
     LinearLayout address;
     Button add_address, edit;
-    LinearLayout logout_layout, share;
+    LinearLayout logout_layout, share,mail;
     DatabaseReference mCartDatabase;
     TextView txt;
 
@@ -46,12 +47,14 @@ public class AccountActivity extends BaseActivity {
         address = (LinearLayout) findViewById(R.id.address);
         add_address = (Button) findViewById(R.id.add_address);
         share = (LinearLayout) findViewById(R.id.share);
+        mail = (LinearLayout) findViewById(R.id.mail);
         edit = (Button) findViewById(R.id.edit);
         btn_login = (Button) findViewById(R.id.btn_login);
         //delete_address = (Button) findViewById(R.id.delete);
         logout_layout = (LinearLayout) findViewById(R.id.logout_layout);
         order_layout = (LinearLayout) findViewById(R.id.order_layout);
         txt = (TextView) findViewById(R.id.txt);
+        mailText = (TextView) findViewById(R.id.mailText);
 
         flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
@@ -87,6 +90,18 @@ public class AccountActivity extends BaseActivity {
                 sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+            }
+        });
+
+        mail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent (Intent.ACTION_VIEW , Uri.parse("mailto:" + "your_email"));
+                intent.putExtra(Intent.EXTRA_SUBJECT, "your_subject");
+                intent.putExtra(Intent.EXTRA_TEXT, "your_text");
+                startActivity(intent);
 
             }
         });
@@ -136,7 +151,6 @@ public class AccountActivity extends BaseActivity {
 
             }
         });
-
 
         mOrderDatabase.addValueEventListener(new ValueEventListener() {
             @Override

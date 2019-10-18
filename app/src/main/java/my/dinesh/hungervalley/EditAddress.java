@@ -106,7 +106,7 @@ public class EditAddress extends AppCompatActivity {
                 "Choose Location",
                 "Ancholi (near bridge)",
                 "Aps Road",
-                "Bharkatiya/kusoli",
+                "Bharkatiya",
                 "Bhatkot",
                 "Bhadelwada",
                 "Bin",
@@ -117,14 +117,18 @@ public class EditAddress extends AppCompatActivity {
                 "Jakhni",
                 "Kasni",
                 "Kumour",
+                "kusoli",
                 "Link Road",
                 "Linthura",
+                "Naya Bazar",
                 "Panda(Check Post)",
                 "Police Line",
                 "Rai",
                 "Siltham",
+                "Simalgair",
                 "Takana",
-                "Tildhukri"
+                "Tildhukri",
+                "Wadda(Rs 30 extra charge)"
 
         };
 

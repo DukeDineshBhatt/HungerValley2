@@ -123,12 +123,14 @@ public class MainActivity extends BaseActivity {
                 slider = findViewById(R.id.banner_slider1);
 
                 slider.setAdapter(new MainSliderAdapter());
+                slider.setInterval(3000);
 
                 //delay for testing empty view functionality
                 slider.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         slider.setAdapter(new MainSliderAdapter());
+
 
                     }
                 }, 3000);

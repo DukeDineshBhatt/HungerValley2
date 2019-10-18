@@ -39,7 +39,7 @@ public class CartActivity extends BaseActivity {
     LinearLayout layout_empty;
     RelativeLayout layout;
     String uId, restaurantId;
-    int flags, discount_int;
+    int flags, discount_int, final_total_price, intent_total_price;
 
     DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase;
 
@@ -73,11 +73,17 @@ public class CartActivity extends BaseActivity {
         SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         uId = (shared.getString("user_id", ""));
 
+
+        intent_total_price = getIntent().getIntExtra("total_price", 0);
+        Log.d("TOTAL", "" + intent_total_price);
+
         //SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         restaurantId = (shared.getString("restaurant", ""));
 
         mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View");
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
+
+
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
 
 
@@ -90,6 +96,27 @@ public class CartActivity extends BaseActivity {
                     progressBar.setVisibility(View.GONE);
                     layout_empty.setVisibility(View.INVISIBLE);
                     layout.setVisibility(View.VISIBLE);
+
+                    mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child("Total price").exists()) {
+
+                                intent_total_price = Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
+
+                            } else {
+
+                                mCartDatabase.child("Total price").setValue(intent_total_price);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
 
                     SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
                     restaurantId = (shared.getString("restaurant", ""));
@@ -204,7 +231,7 @@ public class CartActivity extends BaseActivity {
 
                     progressBar.setVisibility(View.GONE);
                     layout_empty.setVisibility(View.VISIBLE);
-                    layout.setVisibility(View.INVISIBLE);
+                    layout.setVisibility(View.GONE);
 
                 }
 
@@ -270,22 +297,6 @@ public class CartActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
 
-        /*new AlertDialog.Builder(this)
-                .setMessage("cart will be empty once you will change the restaurant!")
-                .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        CartActivity.super.onBackPressed();
-
-                        mCartDatabase.removeValue();
-
-                        Intent intent = new Intent(CartActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    }
-                }).create().show();
-*/
         Intent intent = new Intent(CartActivity.this, MainActivity.class);
         startActivity(intent);
         finish();

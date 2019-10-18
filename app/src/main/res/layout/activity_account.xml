@@ -88,6 +88,39 @@
 
                     </View>
 
+                    <LinearLayout
+                        android:id="@+id/mail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#E7E3E3"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:weightSum="3">
+
+                        <TextView
+                            android:id="@+id/mailText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2.5"
+                            android:text="For any Query/Feedback mail us at help.hungervalley@gmail.com" />
+
+                        <ImageView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:src="@drawable/ic_mail" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="#E4E2E2">
+
+                    </View>
+
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -165,6 +198,15 @@
                         </LinearLayout>
 
                     </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="#E4E2E2">
+
+                    </View>
 
                     <LinearLayout
                         android:layout_width="match_parent"

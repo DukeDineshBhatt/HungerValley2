@@ -172,12 +172,13 @@
         android:id="@+id/cart_layout"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
-        android:animateLayoutChanges="true"
         android:background="@color/colorPrimaryDark"
-        android:gravity="right"
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:visibility="gone"
+        android:layout_marginBottom="42dp"
         android:weightSum="4">
 
         <LinearLayout

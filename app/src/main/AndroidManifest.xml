@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".Application"
@@ -17,11 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ResetPasswordActivity"
-            android:parentActivityName=".ForgetPasswordActivity"></activity>
+        <activity
+            android:name=".ResetPasswordActivity"
+            android:parentActivityName=".ForgetPasswordActivity" />
 
-        <activity android:name=".ForgetPasswordActivity"
-            android:parentActivityName=".LoginActivity"></activity>
+        <activity
+            android:name=".ForgetPasswordActivity"
+            android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".EditAddress"
             android:parentActivityName=".CartActivity" />
@@ -40,6 +41,7 @@
             android:name=".SignupActivity"
             android:parentActivityName=".StartActivity" />
         <activity android:name=".StartActivity" />
+
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,8 +51,8 @@
         </activity>
         <activity
             android:name=".SingleRestaurant"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme" />
