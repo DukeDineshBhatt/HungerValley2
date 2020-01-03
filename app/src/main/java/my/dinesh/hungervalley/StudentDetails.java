@@ -3,31 +3,31 @@ package my.dinesh.hungervalley;
 public class StudentDetails {
 
 
-    private String name;
-    private String phoneNumber;
+  private String name;
+  private String phoneNumber;
 
-    public StudentDetails() {
-        // This is default constructor.
-    }
+  public StudentDetails() {
+    // This is default constructor.
+  }
 
-    public String getStudentName() {
+  public String getStudentName() {
 
-        return name;
-    }
+    return name;
+  }
 
-    public void setStudentName(String name) {
+  public void setStudentName(String name) {
 
-        this.name = name;
-    }
+    this.name = name;
+  }
 
-    public String getStudentPhoneNumber() {
+  public String getStudentPhoneNumber() {
 
-        return phoneNumber;
-    }
+    return phoneNumber;
+  }
 
-    public void setStudentPhoneNumber(String phonenumber) {
+  public void setStudentPhoneNumber(String phonenumber) {
 
-        this.phoneNumber = phonenumber;
-    }
+    this.phoneNumber = phonenumber;
+  }
 
 }

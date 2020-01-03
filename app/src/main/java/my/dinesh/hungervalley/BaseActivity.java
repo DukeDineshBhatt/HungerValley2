@@ -1,16 +1,11 @@
 package my.dinesh.hungervalley;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public abstract class BaseActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -50,7 +45,10 @@ public abstract class BaseActivity extends AppCompatActivity implements BottomNa
 
             } else if (itemId == R.id.cart) {
                 startActivity(new Intent(this, CartActivity.class));
-            } else if (itemId == R.id.account) {
+            }
+            else if (itemId == R.id.feed) {
+                startActivity(new Intent(this, FeedActivity.class));
+            }else if (itemId == R.id.account) {
                 startActivity(new Intent(this, AccountActivity.class));
             }
             finish();

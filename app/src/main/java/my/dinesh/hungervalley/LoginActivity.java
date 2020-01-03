@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,159 +25,160 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    int flags;
-    EditText editTextMobile, editTextPassword;
-    Button button_login;
-    String mobile, passwordEntered;
-    ProgressBar progressbar;
-    TextView forgot_password;
+  private Toolbar toolbar;
+  int flags;
+  EditText editTextMobile, editTextPassword;
+  Button button_login;
+  String mobile, passwordEntered;
+  ProgressBar progressbar;
+  TextView forgot_password;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_login);
 
-        flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
-        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
-        getWindow().getDecorView().setSystemUiVisibility(flags);
-        getWindow().setStatusBarColor(Color.WHITE);
+    flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
+    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
+    getWindow().getDecorView().setSystemUiVisibility(flags);
+    getWindow().setStatusBarColor(Color.WHITE);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+    toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        toolbar.setTitle("");
-
-
-        editTextPassword = (EditText) findViewById(R.id.password);
-        editTextMobile = (EditText) findViewById(R.id.mobile);
-        button_login = (Button) findViewById(R.id.button_login);
-        progressbar = (ProgressBar) findViewById(R.id.progressbar);
-
-        forgot_password = (TextView) findViewById(R.id.forgot_password);
+    toolbar.setTitle("");
 
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+    editTextPassword = (EditText) findViewById(R.id.password);
+    editTextMobile = (EditText) findViewById(R.id.mobile);
+    button_login = (Button) findViewById(R.id.button_login);
+    progressbar = (ProgressBar) findViewById(R.id.progressbar);
 
-        DatabaseReference usersRef = database.getReference("Users");
+    forgot_password = (TextView) findViewById(R.id.forgot_password);
 
-        button_login.setOnClickListener(new View.OnClickListener() {
+    FirebaseApp.initializeApp(this);
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    DatabaseReference usersRef = database.getReference("Users");
+
+    button_login.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+
+        progressbar.setVisibility(View.VISIBLE);
+        mobile = editTextMobile.getText().toString().trim();
+        passwordEntered = editTextPassword.getText().toString().trim();
+
+
+        if (mobile.isEmpty() || mobile.length() < 10) {
+
+          editTextMobile.setError("Enter valid mobile number");
+          editTextMobile.requestFocus();
+          progressbar.setVisibility(View.GONE);
+          return;
+        } else if (passwordEntered.isEmpty() || passwordEntered.length() < 6) {
+
+          editTextPassword.setError("Enter your 6 digit password");
+          editTextPassword.requestFocus();
+          progressbar.setVisibility(View.GONE);
+          return;
+        } else {
+
+          usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View view) {
-
-                progressbar.setVisibility(View.VISIBLE);
-                mobile = editTextMobile.getText().toString().trim();
-                passwordEntered = editTextPassword.getText().toString().trim();
+            public void onDataChange(DataSnapshot snapshot) {
 
 
-                if (mobile.isEmpty() || mobile.length() < 10) {
+              //String password = snapshot.child(mobile).child("password").getValue().toString();
 
-                    editTextMobile.setError("Enter valid mobile number");
-                    editTextMobile.requestFocus();
-                    progressbar.setVisibility(View.GONE);
-                    return;
-                } else if (passwordEntered.isEmpty() || passwordEntered.length() < 6) {
+              if (snapshot.hasChild(mobile)) {
 
-                    editTextPassword.setError("Enter your 6 digit password");
-                    editTextPassword.requestFocus();
-                    progressbar.setVisibility(View.GONE);
-                    return;
+                String password = snapshot.child(mobile).child("password").getValue().toString();
+
+                if (password.equals(passwordEntered)) {
+
+                  progressbar.setVisibility(View.GONE);
+                  Toast.makeText(LoginActivity.this, "Log in successfully.", Toast.LENGTH_SHORT).show();
+
+                  SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+                  SharedPreferences.Editor editor = mPrefs.edit();
+                  editor.putString("user_id", mobile);
+                  editor.putBoolean("is_logged_before", true); //this line will do trick
+                  editor.commit();
+
+                  Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                  //intent.putExtra("mobile", mobile);
+                  startActivity(intent);
+                  finish();
+
                 } else {
+                  progressbar.setVisibility(View.GONE);
+                  Toast.makeText(LoginActivity.this, "Incorrect details.", Toast.LENGTH_SHORT).show();
 
-                    usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-
-
-                            //String password = snapshot.child(mobile).child("password").getValue().toString();
-
-                            if (snapshot.hasChild(mobile)) {
-
-                                String password = snapshot.child(mobile).child("password").getValue().toString();
-
-                                if (password.equals(passwordEntered)) {
-
-                                    progressbar.setVisibility(View.GONE);
-                                    Toast.makeText(LoginActivity.this, "Log in successfully.", Toast.LENGTH_SHORT).show();
-
-                                    SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = mPrefs.edit();
-                                    editor.putString("user_id", mobile);
-                                    editor.putBoolean("is_logged_before", true); //this line will do trick
-                                    editor.commit();
-
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    //intent.putExtra("mobile", mobile);
-                                    startActivity(intent);
-                                    finish();
-
-                                } else {
-                                    progressbar.setVisibility(View.GONE);
-                                    Toast.makeText(LoginActivity.this, "Incorrect details.", Toast.LENGTH_SHORT).show();
-
-                                }
-
-
-                            } else {
-                                progressbar.setVisibility(View.GONE);
-                                Toast.makeText(LoginActivity.this, "Incorrect details.", Toast.LENGTH_SHORT).show();
-
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            progressbar.setVisibility(View.GONE);
-                        }
-                    });
                 }
 
 
+              } else {
+                progressbar.setVisibility(View.GONE);
+                Toast.makeText(LoginActivity.this, "Incorrect details.", Toast.LENGTH_SHORT).show();
+
+              }
             }
 
-        });
-
-        progressbar.setVisibility(View.GONE);
-
-      forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
-
-                startActivity(intent);
-
+              progressbar.setVisibility(View.GONE);
             }
-        });
-
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-
-                Intent intent = new Intent(LoginActivity.this, StartActivity.class);
-                startActivity(intent);
-                finish();
-
-                return super.onOptionsItemSelected(item);
-            default:
-                return super.onOptionsItemSelected(item);
+          });
         }
-    }
 
 
-    @Override
-    public void onBackPressed() {
+      }
+
+    });
+
+    progressbar.setVisibility(View.GONE);
+
+    forgot_password.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+
+        Intent intent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
+
+        startActivity(intent);
+
+      }
+    });
+
+  }
+
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+
         Intent intent = new Intent(LoginActivity.this, StartActivity.class);
         startActivity(intent);
         finish();
+
+        return super.onOptionsItemSelected(item);
+      default:
+        return super.onOptionsItemSelected(item);
     }
+  }
+
+
+  @Override
+  public void onBackPressed() {
+    Intent intent = new Intent(LoginActivity.this, StartActivity.class);
+    startActivity(intent);
+    finish();
+  }
 
 }

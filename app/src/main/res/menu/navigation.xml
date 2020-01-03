@@ -12,6 +12,11 @@
         android:title="Cart" />
 
     <item
+        android:id="@+id/feed"
+        android:icon="@drawable/ic_action_feed"
+        android:title="Feed" />
+
+    <item
         android:id="@+id/account"
         android:icon="@drawable/ic_person_white"
         android:title="Account" />

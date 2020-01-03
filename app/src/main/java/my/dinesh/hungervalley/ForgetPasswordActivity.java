@@ -25,178 +25,178 @@ import java.util.Random;
 
 public class ForgetPasswordActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
-    int flags;
-    EditText mobile, key;
-    Button btn, change;
-    ProgressBar progressBar;
-    LinearLayout layout_two;
-    String temp_key, txt;
+  private Toolbar toolbar;
+  int flags;
+  EditText mobile, key;
+  Button btn, change;
+  ProgressBar progressBar;
+  LinearLayout layout_two;
+  String temp_key, txt;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forget_password);
-
-
-        flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
-        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
-        getWindow().getDecorView().setSystemUiVisibility(flags);
-        getWindow().setStatusBarColor(Color.WHITE);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        layout_two = (LinearLayout) findViewById(R.id.layout_two);
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        toolbar.setTitle("");
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_forget_password);
 
 
-        btn = (Button) findViewById(R.id.btn);
-        change = (Button) findViewById(R.id.change);
-        mobile = (EditText) findViewById(R.id.mobile);
-        key = (EditText) findViewById(R.id.key);
-        progressBar = (ProgressBar) findViewById(R.id.progressbar);
+    flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
+    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
+    getWindow().getDecorView().setSystemUiVisibility(flags);
+    getWindow().setStatusBarColor(Color.WHITE);
+
+    toolbar = (Toolbar) findViewById(R.id.toolbar);
+    layout_two = (LinearLayout) findViewById(R.id.layout_two);
+
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+    toolbar.setTitle("");
 
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+    btn = (Button) findViewById(R.id.btn);
+    change = (Button) findViewById(R.id.change);
+    mobile = (EditText) findViewById(R.id.mobile);
+    key = (EditText) findViewById(R.id.key);
+    progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
-        DatabaseReference mRequestDatabase = database.getReference("User Requests");
 
-        DatabaseReference usersRef = database.getReference("Users");
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    DatabaseReference mRequestDatabase = database.getReference("User Requests");
+
+    DatabaseReference usersRef = database.getReference("Users");
 
 
-        btn.setOnClickListener(new View.OnClickListener() {
+    btn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        txt = mobile.getText().toString().trim();
+
+
+        if (txt.isEmpty() || txt.length() < 10) {
+
+          progressBar.setVisibility(View.GONE);
+
+          mobile.setError("Enter valid mobile number");
+          mobile.requestFocus();
+
+          return;
+
+        } else {
+
+          usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                progressBar.setVisibility(View.VISIBLE);
-
-                txt = mobile.getText().toString().trim();
+              if (dataSnapshot.hasChild(txt)) {
 
 
-                if (txt.isEmpty() || txt.length() < 10) {
+                mRequestDatabase.child(txt).child("key").setValue(getSaltString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                  @Override
+                  public void onComplete(@NonNull Task<Void> task) {
 
-                    progressBar.setVisibility(View.GONE);
+                    mRequestDatabase.child(txt).child("key").addListenerForSingleValueEvent(new ValueEventListener() {
+                      @Override
+                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    mobile.setError("Enter valid mobile number");
-                    mobile.requestFocus();
-
-                    return;
-
-                } else {
-
-                    usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            if (dataSnapshot.hasChild(txt)) {
+                        layout_two.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
 
 
-                                mRequestDatabase.child(txt).child("key").setValue(getSaltString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
+                        change.setOnClickListener(new View.OnClickListener() {
+                          @Override
+                          public void onClick(View v) {
 
-                                        mRequestDatabase.child(txt).child("key").addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            mRequestDatabase.child(txt).addListenerForSingleValueEvent(new ValueEventListener() {
+                              @Override
+                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                layout_two.setVisibility(View.VISIBLE);
-                                                progressBar.setVisibility(View.GONE);
+                                temp_key = key.getText().toString().trim();
+                                String s = dataSnapshot.child("key").getValue().toString().trim();
 
+                                if (temp_key.isEmpty()) {
 
-                                                change.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-
-                                                        mRequestDatabase.child(txt).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                                temp_key = key.getText().toString().trim();
-                                                                String s = dataSnapshot.child("key").getValue().toString().trim();
-
-                                                                if (temp_key.isEmpty()) {
-
-                                                                    Toast.makeText(ForgetPasswordActivity.this, "Enter key", Toast.LENGTH_SHORT).show();
+                                  Toast.makeText(ForgetPasswordActivity.this, "Enter key", Toast.LENGTH_SHORT).show();
 
 
-                                                                } else if (s.equals(temp_key)) {
+                                } else if (s.equals(temp_key)) {
 
-                                                                    Intent intent = new Intent(ForgetPasswordActivity.this, ResetPasswordActivity.class);
-                                                                    intent.putExtra("userid", txt);
-                                                                    startActivity(intent);
-                                                                } else {
+                                  Intent intent = new Intent(ForgetPasswordActivity.this, ResetPasswordActivity.class);
+                                  intent.putExtra("userid", txt);
+                                  startActivity(intent);
+                                } else {
 
-                                                                    Toast.makeText(ForgetPasswordActivity.this, "Incorrect key", Toast.LENGTH_SHORT).show();
-
-
-                                                                }
+                                  Toast.makeText(ForgetPasswordActivity.this, "Incorrect key", Toast.LENGTH_SHORT).show();
 
 
-                                                            }
-
-                                                            @Override
-                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                            }
-                                                        });
+                                }
 
 
-                                                    }
-                                                });
+                              }
+
+                              @Override
+                              public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                              }
+                            });
 
 
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-                                    }
-                                });
+                          }
+                        });
 
 
-                            } else {
+                      }
 
-                                progressBar.setVisibility(View.GONE);
+                      @Override
+                      public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                Toast.makeText(ForgetPasswordActivity.this, "This Number Is not Registered! Enter Your Registered number", Toast.LENGTH_LONG).show();
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            progressBar.setVisibility(View.GONE);
-                        }
+                      }
                     });
 
+                  }
+                });
 
-                }
+
+              } else {
+
+                progressBar.setVisibility(View.GONE);
+
+                Toast.makeText(ForgetPasswordActivity.this, "This Number Is not Registered! Enter Your Registered number", Toast.LENGTH_LONG).show();
+
+              }
 
             }
-        });
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+              progressBar.setVisibility(View.GONE);
+            }
+          });
 
 
-    }
-
-    protected String getSaltString() {
-        String SALTCHARS = "ABcDeFGHIJKLmNOpQRSTUVWxYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 5) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
         }
-        String saltStr = salt.toString();
-        return saltStr;
 
+      }
+    });
+
+
+  }
+
+  protected String getSaltString() {
+    String SALTCHARS = "ABcDeFGHIJKLmNOpQRSTUVWxYZ1234567890";
+    StringBuilder salt = new StringBuilder();
+    Random rnd = new Random();
+    while (salt.length() < 5) { // length of the random string.
+      int index = (int) (rnd.nextFloat() * SALTCHARS.length());
+      salt.append(SALTCHARS.charAt(index));
     }
+    String saltStr = salt.toString();
+    return saltStr;
+
+  }
 }

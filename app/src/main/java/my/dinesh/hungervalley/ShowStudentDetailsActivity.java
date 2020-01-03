@@ -19,63 +19,63 @@ import java.util.List;
 public class ShowStudentDetailsActivity extends AppCompatActivity {
 
 
-    DatabaseReference databaseReference;
+  DatabaseReference databaseReference;
 
-    ProgressDialog progressDialog;
+  ProgressDialog progressDialog;
 
-    List<StudentDetails> list = new ArrayList<>();
+  List<StudentDetails> list = new ArrayList<>();
 
-    RecyclerView recyclerView;
+  RecyclerView recyclerView;
 
-    RecyclerView.Adapter adapter ;
+  RecyclerView.Adapter adapter ;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_student_details);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_show_student_details);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+    recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        recyclerView.setHasFixedSize(true);
+    recyclerView.setHasFixedSize(true);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(ShowStudentDetailsActivity.this));
+    recyclerView.setLayoutManager(new LinearLayoutManager(ShowStudentDetailsActivity.this));
 
-        progressDialog = new ProgressDialog(ShowStudentDetailsActivity.this);
+    progressDialog = new ProgressDialog(ShowStudentDetailsActivity.this);
 
-        progressDialog.setMessage("Loading Data from Firebase Database");
+    progressDialog.setMessage("Loading Data from Firebase Database");
 
-        progressDialog.show();
+    progressDialog.show();
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child("8826601886").child("Cakes & Pizzas");
+    databaseReference = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child("8826601886").child("Cakes & Pizzas");
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
+    databaseReference.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot snapshot) {
 
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
-                    StudentDetails studentDetails = dataSnapshot.getValue(StudentDetails.class);
+          StudentDetails studentDetails = dataSnapshot.getValue(StudentDetails.class);
 
-                    list.add(studentDetails);
+          list.add(studentDetails);
 
-                    Log.d("DINESH",dataSnapshot.getValue().toString());
-                }
+          Log.d("DINESH",dataSnapshot.getValue().toString());
+        }
 
 
-                adapter = new RecyclerViewAdapter(ShowStudentDetailsActivity.this, list);
+        adapter = new RecyclerViewAdapter(ShowStudentDetailsActivity.this, list);
 
-                recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
 
-                progressDialog.dismiss();
-            }
+        progressDialog.dismiss();
+      }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
 
-                progressDialog.dismiss();
+        progressDialog.dismiss();
 
-            }
-        });
+      }
+    });
 
-    }
+  }
 }

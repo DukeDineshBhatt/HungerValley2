@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="my.dinesh.hungervalley">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,29 +17,43 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".FeedActivity"
+            android:screenOrientation="portrait" ></activity>
         <activity
             android:name=".ResetPasswordActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".ForgetPasswordActivity" />
-
         <activity
             android:name=".ForgetPasswordActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".EditAddress"
+            android:screenOrientation="portrait"
             android:parentActivityName=".CartActivity" />
         <activity
             android:name=".ConfirmOrder"
+            android:screenOrientation="portrait"
             android:parentActivityName=".CartActivity" />
         <activity
             android:name=".SetAddress"
+            android:screenOrientation="portrait"
             android:parentActivityName=".CartActivity" />
-        <activity android:name=".AccountActivity" />
-        <activity android:name=".CartActivity" />
+
+        <activity android:name=".AccountActivity"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".CartActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".StartActivity" />
+
         <activity
             android:name=".SignupActivity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".StartActivity" />
         <activity android:name=".StartActivity" />
 
@@ -51,10 +66,12 @@
         </activity>
         <activity
             android:name=".SingleRestaurant"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name=".ShowStudentDetailsActivity" />
     </application>
