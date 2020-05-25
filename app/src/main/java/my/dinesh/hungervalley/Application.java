@@ -1,15 +1,22 @@
 package my.dinesh.hungervalley;
 
+import android.content.Context;
+
 public class Application extends android.app.Application {
     private String someVariable;
     private String cartVariable;
     private String userId;
 
+    private static Context context;
+    public static Context getContext() {
+        return context;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-
+        context = getApplicationContext();
     }
 
     public String getCartVariable() {

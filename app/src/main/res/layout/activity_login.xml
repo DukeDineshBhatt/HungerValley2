@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -58,6 +58,7 @@
                     android:hint="enter your mobile number"
                     android:inputType="phone"
                     android:maxLength="10"
+                    android:digits="0123456789"
                     android:paddingStart="5dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="8dp"
@@ -70,34 +71,52 @@
             </LinearLayout>
 
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp">
 
-                <EditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="25dp"
-                    android:hint="Password"
-                    android:inputType="textPassword"
-                    android:paddingStart="18dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="8dp"
-                    android:textSize="18sp">
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
 
-                </EditText>
+                    <EditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="25dp"
+                        android:hint="password"
+                        android:inputType="textPassword"
+                        android:paddingStart="18dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="18sp">
 
-            </android.support.design.widget.TextInputLayout>
+                    </EditText>
+
+                    <ImageView
+                        android:id="@+id/show_pass_btn"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="5dp"
+                        android:alpha=".5"
+                        android:onClick="ShowHidePass"
+                        android:padding="5dp"
+                        android:src="@drawable/hide" />
+
+                </RelativeLayout>
+
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Button
                 android:id="@+id/button_login"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mobile_confirm"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="35dp"
                 android:background="@color/colorPrimaryDark"
                 android:text="Log in"
                 android:textAllCaps="false"

@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -179,6 +183,27 @@ public class LoginActivity extends AppCompatActivity {
     Intent intent = new Intent(LoginActivity.this, StartActivity.class);
     startActivity(intent);
     finish();
+  }
+
+  public void ShowHidePass(View view){
+
+    if(view.getId()==R.id.show_pass_btn){
+
+      if(editTextPassword.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+
+        ((ImageView)(view)).setImageResource(R.drawable.show);
+
+        //Show Password
+        editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+      }
+      else{
+        ((ImageView)(view)).setImageResource(R.drawable.hide);
+
+        //Hide Password
+        editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+      }
+    }
   }
 
 }

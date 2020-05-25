@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -56,11 +56,11 @@
             android:text="Locality/Village/Area" />
 
         <EditText
+            android:id="@+id/locality"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:id="@+id/locality"/>
+            android:layout_marginRight="12dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -72,13 +72,13 @@
             android:text="Landmark" />
 
         <EditText
+            android:id="@+id/landmark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:layout_marginRight="12dp"
             android:lines="1"
             android:maxLines="1"
-            android:id="@+id/landmark"
             android:singleLine="true" />
 
         <TextView
@@ -113,6 +113,7 @@
                 android:ems="10"
                 android:inputType="phone"
                 android:maxLength="10"
+                android:digits="0123456789"
                 android:paddingStart="5dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="8dp"

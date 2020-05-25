@@ -4,12 +4,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.FirebaseApp;
@@ -39,13 +44,19 @@ public class FeedActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
+        }
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
-        getWindow().getDecorView().setSystemUiVisibility(flags);
-        getWindow().setStatusBarColor(Color.WHITE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.WHITE);
+        }
 
 
-        recyclerView = (RecyclerView) findViewById(R.id.upload_list);
+       /* recyclerView = (RecyclerView) findViewById(R.id.upload_list);
 
         SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         uId = (shared.getString("user_id", ""));
@@ -70,6 +81,7 @@ public class FeedActivity extends BaseActivity {
         ) {
             @Override
             protected void populateViewHolder(FriendsViewHolder viewHolder, MyFeedData model, int position) {
+                viewHolder.setIsRecyclable(false);
 
                 final String list_user_id = getRef(position).getKey();
 
@@ -77,45 +89,144 @@ public class FeedActivity extends BaseActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String likes = dataSnapshot.child("Likes Count").getValue().toString();
+                        String image = dataSnapshot.child("Image").getValue().toString();
+                        String type = dataSnapshot.child("Type").getValue().toString();
 
-                        final String image = dataSnapshot.child("Image").getValue().toString();
 
-                        if (dataSnapshot.child("Likes").hasChild(uId)) {
+                        viewHolder.setName(dataSnapshot.child("Caption").getValue().toString());
+                        viewHolder.setImage(image);
+
+                        if (type.equals("Video")) {
+                            String url = dataSnapshot.child("url").getValue().toString();
+
+                            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    Intent intent = new Intent(FeedActivity.this, YoutubeActivity.class);
+                                    intent.putExtra("url", url);
+                                    startActivity(intent);
+
+                                }
+                            });
+                        }
+
+
+                        //for likes count
+                        if (dataSnapshot.hasChild("Likes Count")) {
+
+                            viewHolder.likes_count.setText(dataSnapshot.child("Likes Count").getValue().toString() + " likes");
+
+                        }
+
+                        //for comments count
+                        if (dataSnapshot.hasChild("Comments Count")) {
+
+                            viewHolder.comment.setVisibility(View.VISIBLE);
+                            viewHolder.comment.setText("View all " + dataSnapshot.child("Comments Count").getValue().toString() + " comments");
+
+
+                        } else {
+
+                            viewHolder.comment.setVisibility(View.GONE);
+                        }
+
+
+                        if (dataSnapshot.child("Likes").child(uId).hasChild("Like")) {
 
                             viewHolder.like.setBackgroundResource(R.drawable.liked);
+
+                            viewHolder.like.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mFeedDatabase.child(list_user_id).child("Likes").child(uId).child("Like").removeValue();
+                                    mFeedDatabase.child(list_user_id).child("Likes Count").setValue(Integer.parseInt(dataSnapshot.child("Likes Count").getValue().toString()) - 1);
+                                    viewHolder.like.setBackgroundResource(R.drawable.like);
+
+
+                                }
+                            });
+
 
                         } else {
 
                             viewHolder.like.setBackgroundResource(R.drawable.like);
-                        }
 
-                        viewHolder.likes_count.setText(likes + " likes");
-                        viewHolder.setName(dataSnapshot.child("Caption").getValue().toString());
-                        viewHolder.setImage(image);
-
-                        viewHolder.like.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-
-                                if (dataSnapshot.child("Likes").hasChild(uId)) {
+                            viewHolder.like.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
 
                                     viewHolder.like.setBackgroundResource(R.drawable.liked);
 
-                                } else {
-                                    viewHolder.like.setBackgroundResource(R.drawable.like);
+                                    mFeedDatabase.child(list_user_id).child("Likes").child(uId).child("Like").setValue("yes");
+                                    mFeedDatabase.child(list_user_id).child("Likes Count").setValue(Integer.parseInt(dataSnapshot.child("Likes Count").getValue().toString()) + 1);
+                                    // viewHolder.likes_count.setText(dataSnapshot.child("Likes Count").getValue().toString() + " likes");
+
+                                    if (dataSnapshot.hasChild("Likes Count")) {
+
+                                        mFeedDatabase.child(list_user_id).child("Likes Count").setValue(Integer.parseInt(dataSnapshot.child("Likes Count").getValue().toString()) + 1);
+
+                                    } else {
+
+                                        mFeedDatabase.child(list_user_id).child("Likes Count").setValue(1);
+
+                                    }
                                 }
+                            });
+                        }
 
+                        if (dataSnapshot.hasChild("Comments Count")) {
 
-                            }
-                        });
+                            viewHolder.post.setOnClickListener(new View.OnClickListener() {
 
+                                @Override
+                                public void onClick(View view) {
+                                    String sUsername = viewHolder.editComment.getText().toString();
 
+                                    if (sUsername.matches(" ") || sUsername.matches("")) {
+
+                                    } else {
+
+                                        mFeedDatabase.child(list_user_id).child("Likes").child(uId).child("Comment").push().setValue(sUsername);
+                                        mFeedDatabase.child(list_user_id).child("Comments Count").setValue(Integer.parseInt(dataSnapshot.child("Comments Count").getValue().toString()) + 1);
+                                        viewHolder.editComment.setText("");
+                                        viewHolder.editComment.setHint("Add a comment..");
+
+                                    }
+
+                                }
+                            });
+
+                        } else {
+
+                            viewHolder.post.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mFeedDatabase.child(list_user_id).child("Likes").child(uId).child("Comment").push().setValue(viewHolder.editComment.getText().toString());
+                                    viewHolder.editComment.setText(" ");
+
+                                    if (dataSnapshot.hasChild("Comments Count")) {
+
+                                        mFeedDatabase.child(list_user_id).child("Comments Count").setValue(Integer.parseInt(dataSnapshot.child("Comments Count").getValue().toString()) + 1);
+                                        viewHolder.editComment.setHint("Add a comment..");
+
+                                    } else {
+
+                                        mFeedDatabase.child(list_user_id).child("Comments Count").setValue(1);
+                                        viewHolder.editComment.setHint("Add a comment..");
+
+                                    }
+
+                                }
+                            });
+
+                        }
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
 
                     }
                 });
@@ -124,7 +235,7 @@ public class FeedActivity extends BaseActivity {
         };
 
         recyclerView.setAdapter(friendsRecyclerView);
-
+*/
 
     }
 
@@ -133,7 +244,9 @@ public class FeedActivity extends BaseActivity {
 
         View mView;
         ImageView like;
-        TextView likes_count;
+        TextView likes_count, comment, post;
+        EditText editComment;
+        ImageView imageView;
 
         public FriendsViewHolder(View itemView) {
             super(itemView);
@@ -141,13 +254,15 @@ public class FeedActivity extends BaseActivity {
             mView = itemView;
             like = (ImageView) itemView.findViewById(R.id.like);
             likes_count = (TextView) itemView.findViewById(R.id.like_count);
-
+            comment = (TextView) itemView.findViewById(R.id.comment);
+            post = (TextView) itemView.findViewById(R.id.post);
+            editComment = (EditText) itemView.findViewById(R.id.editComment);
+            imageView = (ImageView) itemView.findViewById(R.id.image);
 
         }
 
-
         public void setName(String name) {
-            TextView userName = (TextView) mView.findViewById(R.id.name);
+            TextView userName = (TextView) mView.findViewById(R.id.caption);
             userName.setText(name);
         }
 
@@ -155,7 +270,7 @@ public class FeedActivity extends BaseActivity {
 
 
             if (!image.equals("default")) {
-                ImageView imageView = (ImageView) mView.findViewById(R.id.image);
+
                 Picasso
                         .with(mView.getContext())
                         .load(image)

@@ -5,12 +5,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.os.StrictMode;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -21,8 +28,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -30,11 +42,12 @@ public class SignupActivity extends AppCompatActivity {
   int flags;
 
   EditText editTextMobile;
-  EditText editTextMobileConfrim, editTextUsername, editTextPassword,editTextConfrmPassword;
+  EditText  editTextUsername, editTextPassword;
 
   String mobile, mobile_confrm, password, username,confrm_password;
   Button btn_continue;
   ProgressBar progressbar;
+  int randomNumber;
 
 
   @Override
@@ -56,10 +69,10 @@ public class SignupActivity extends AppCompatActivity {
     toolbar.setTitle("");
 
     editTextMobile = findViewById(R.id.mobile);
-    editTextMobileConfrim = findViewById(R.id.mobile_confirm);
+    //editTextMobileConfrim = findViewById(R.id.mobile_confirm);
     editTextUsername = findViewById(R.id.username);
     editTextPassword = findViewById(R.id.password);
-    editTextConfrmPassword = findViewById(R.id.confrm_password);
+    //editTextConfrmPassword = findViewById(R.id.confrm_password);
     btn_continue = findViewById(R.id.buttonContinue);
     progressbar = findViewById(R.id.progressbar);
 
@@ -68,6 +81,8 @@ public class SignupActivity extends AppCompatActivity {
 
     DatabaseReference usersRef = database.getReference("Users");
 
+    StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
+    StrictMode.setThreadPolicy(policy);
 
     btn_continue.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -76,10 +91,10 @@ public class SignupActivity extends AppCompatActivity {
         progressbar.setVisibility(View.VISIBLE);
 
         mobile = editTextMobile.getText().toString().trim();
-        mobile_confrm = editTextMobileConfrim.getText().toString().trim();
+        //mobile_confrm = editTextMobileConfrim.getText().toString().trim();
         password = editTextPassword.getText().toString().trim();
         username = editTextUsername.getText().toString().trim();
-        confrm_password = editTextConfrmPassword.getText().toString().trim();
+        //confrm_password = editTextConfrmPassword.getText().toString().trim();
 
         if (username.isEmpty()) {
           progressbar.setVisibility(View.GONE);
@@ -94,31 +109,20 @@ public class SignupActivity extends AppCompatActivity {
           editTextMobile.setError("Enter a valid mobile number");
           editTextMobile.requestFocus();
           return;
-        } else if (!(mobile.equals(mobile_confrm))) {
-          progressbar.setVisibility(View.GONE);
 
-          editTextMobileConfrim.setError("Enter Correct mobile number");
-          editTextMobileConfrim.requestFocus();
-          return;
         } else if (password.isEmpty() || password.length() < 6) {
           progressbar.setVisibility(View.GONE);
 
           editTextPassword.setError("Enter 6 digit password");
           editTextPassword.requestFocus();
 
-        } else if (!(password.equals(confrm_password))) {
-          progressbar.setVisibility(View.GONE);
-
-          editTextConfrmPassword.setError("Password not matched");
-          editTextConfrmPassword.requestFocus();
-
         } else {
-
 
           usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-              if (snapshot.hasChild(mobile_confrm)) {
+
+              if (snapshot.hasChild(mobile)) {
 
                 progressbar.setVisibility(View.GONE);
 
@@ -130,14 +134,59 @@ public class SignupActivity extends AppCompatActivity {
               } else {
 
 
+                try {
+                  // Construct data
+                  //int randomNumber;
+                  String apiKey = "apikey=" + "C5ksL1aQZqQ-aoi8riQqvQtwzjQkjfC99pZuoPp9Zf";
+                  Random random= new Random();
+                  randomNumber= random.nextInt(999999);
+                  String message = "&message=" + "Your Verification Code for Hunger Valley Account is "+ randomNumber;
+                  String sender = "&sender=" + "TXTLCL";
+                  String numbers = "&numbers=" +editTextMobile.getText().toString();
 
+                  Log.d("NUMBER",editTextMobile.getText().toString());
+
+                  // Send data
+                  HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
+                  String data = apiKey + numbers + message + sender;
+                  conn.setDoOutput(true);
+                  conn.setRequestMethod("POST");
+                  conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+                  conn.getOutputStream().write(data.getBytes("UTF-8"));
+                  final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                  final StringBuffer stringBuffer = new StringBuffer();
+                  String line;
+                  while ((line = rd.readLine()) != null) {
+                    stringBuffer.append(line);
+                  }
+                  rd.close();
+                  Toast.makeText(getApplicationContext(),"OTP SEND SUCCESSFULLY",Toast.LENGTH_LONG).show();
+                  Log.d("OTP : " ," " +randomNumber);
+
+                  Intent intent = new Intent(SignupActivity.this, OTP.class);
+                  intent.putExtra("OTP", randomNumber);
+                  intent.putExtra("username", username);
+                  intent.putExtra("password", password);
+                  intent.putExtra("mobile", mobile);
+                  startActivity(intent);
+
+                  //return stringBuffer.toString();
+                } catch (Exception e) {
+                  progressbar.setVisibility(View.GONE);
+                  //System.out.println("Error SMS "+e);
+                  // return "Error "+e;
+                  Toast.makeText(getApplicationContext(), "ERROR SENDING OTP TO THIS NUMBER!", Toast.LENGTH_LONG).show();
+                  //Toast.makeText(getApplicationContext(), "ERROR" +e, Toast.LENGTH_LONG).show();
+
+                }
+/*
                 SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = mPrefs.edit();
                 editor.putBoolean("is_logged_before", true); //this line will do trick
                 editor.commit();
 
 
-                String userid = editTextMobileConfrim.getText().toString().trim();
+                String userid = editTextMobile.getText().toString().trim();
 
                 Map userMap = new HashMap();
                 userMap.put("username", username);
@@ -154,8 +203,9 @@ public class SignupActivity extends AppCompatActivity {
 
                 startActivity(intent);
                 finish();
+*/
 
-                progressbar.setVisibility(View.GONE);
+
 
               }
             }
@@ -171,6 +221,27 @@ public class SignupActivity extends AppCompatActivity {
 
       }
     });
+  }
+
+  public void ShowHidePass(View view){
+
+    if(view.getId()==R.id.show_pass_btn){
+
+      if(editTextPassword.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+
+        (( ImageView)(view)).setImageResource(R.drawable.show);
+
+        //Show Password
+        editTextPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+      }
+      else{
+        ((ImageView)(view)).setImageResource(R.drawable.hide);
+
+        //Hide Password
+        editTextPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+      }
+    }
   }
 
 }

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="my.dinesh.hungervalley">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,62 +17,94 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".FeedActivity"
-            android:screenOrientation="portrait" ></activity>
+        <activity
+            android:name=".OTP"
+            android:parentActivityName=".SignupActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".YoutubeActivity"></activity>
+        <activity
+            android:name=".FeedActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ResetPasswordActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".ForgetPasswordActivity" />
+            android:parentActivityName=".ForgetPasswordActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
         <activity
             android:name=".ForgetPasswordActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".LoginActivity" />
+            android:parentActivityName=".LoginActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EditAddress"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".CartActivity" />
+            android:parentActivityName=".CartActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ConfirmOrder"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".CartActivity" />
+            android:parentActivityName=".CartActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SetAddress"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".CartActivity" />
-
-        <activity android:name=".AccountActivity"
+            android:parentActivityName=".CartActivity"
             android:screenOrientation="portrait" />
-
-        <activity android:name=".CartActivity"
+        <activity
+            android:name=".AccountActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CartActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".StartActivity" />
-
+            android:parentActivityName=".StartActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SignupActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".StartActivity" />
-        <activity android:name=".StartActivity" />
+            android:parentActivityName=".StartActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StartActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait">
 
-        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".SingleRestaurant"
-            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name=".ShowStudentDetailsActivity" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/logo" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -3,25 +3,25 @@ package my.dinesh.hungervalley;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class ResetPasswordActivity extends AppCompatActivity {
-
 
   private Toolbar toolbar;
   int flags;
@@ -124,5 +124,47 @@ public class ResetPasswordActivity extends AppCompatActivity {
     });
 
 
+  }
+
+  public void ShowHidePass(View view){
+
+    if(view.getId()==R.id.show_pass_btn){
+
+      if(password.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+
+        ((ImageView)(view)).setImageResource(R.drawable.hide);
+
+        //Show Password
+        password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+      }
+      else{
+        ((ImageView)(view)).setImageResource(R.drawable.show);
+
+        //Hide Password
+        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+      }
+    }
+  }
+
+  public void ShowHidePass1(View view){
+
+    if(view.getId()==R.id.show_con_pass_btn){
+
+      if(confrm_password.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+
+        ((ImageView)(view)).setImageResource(R.drawable.show);
+
+        //Show Password
+        confrm_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+      }
+      else{
+        ((ImageView)(view)).setImageResource(R.drawable.hide);
+
+        //Hide Password
+        confrm_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+      }
+    }
   }
 }
