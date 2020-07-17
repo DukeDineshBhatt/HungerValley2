@@ -7,6 +7,8 @@ public class Application extends android.app.Application {
     private String cartVariable;
     private String userId;
 
+    public String baseurl = "https://www.fast2sms.com/";
+
     private static Context context;
     public static Context getContext() {
         return context;

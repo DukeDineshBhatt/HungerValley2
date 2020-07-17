@@ -4,19 +4,24 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -42,6 +47,7 @@ public class MainActivity extends BaseActivity {
     Window window;
     int flags;
     int mSelectedItem;
+    //ImageView bannersmall;
 
     private Slider slider;
     private RecyclerView recyclerView;
@@ -52,7 +58,8 @@ public class MainActivity extends BaseActivity {
 
     ImageView img1, img2, img3, img4, img5;
 
-    String banner1,banner2,banner3,banner4;
+    String banner1, banner2, banner3, banner4;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,7 @@ public class MainActivity extends BaseActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Hunger Valley");
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
 
         SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         uId = (shared.getString("user_id", ""));
@@ -80,6 +88,7 @@ public class MainActivity extends BaseActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.upload_list);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        //bannersmall = (ImageView) findViewById(R.id.bannerSmall);
 
         img1 = (ImageView) findViewById(R.id.img1);
         img2 = (ImageView) findViewById(R.id.img2);
@@ -92,8 +101,6 @@ public class MainActivity extends BaseActivity {
 
         mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants");
         mRestaurantDatabase.keepSynced(true);
-
-
 
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View");
 
@@ -116,11 +123,11 @@ public class MainActivity extends BaseActivity {
 
                 Slider.init(new PicassoImageLoadingService(MainActivity.this));
 
-
                 slider = findViewById(R.id.banner_slider1);
 
                 slider.setAdapter(new MainSliderAdapter());
                 slider.setInterval(3000);
+                slider.hideIndicators();
 
                 //delay for testing empty view functionality
                 slider.postDelayed(new Runnable() {
@@ -139,7 +146,6 @@ public class MainActivity extends BaseActivity {
 
             }
         });
-
 
 
         linearLayoutManager = new LinearLayoutManager(MainActivity.this);
@@ -173,25 +179,41 @@ public class MainActivity extends BaseActivity {
                             final String rating = dataSnapshot.child("Rating").getValue().toString();
 
 
-                            if (dataSnapshot.child("Discount").exists()){
+                            if (dataSnapshot.child("Status").exists()) {
+
+                                viewHolder.main_view.setAlpha(0.6f);
+
+                            }
+
+                            if (dataSnapshot.child("Reason").exists()) {
+
+                                viewHolder.status.setVisibility(View.VISIBLE);
+                                final String reason = dataSnapshot.child("Reason").getValue().toString();
+                                viewHolder.status.setText(reason);
+
+
+                            }
+
+                            if (dataSnapshot.child("Discount").exists()) {
 
                                 viewHolder.layout_discount.setVisibility(View.VISIBLE);
 
 
-                            }else {
+                            } else {
 
                                 viewHolder.layout_discount.setVisibility(View.GONE);
                             }
 
+
                             float a = Float.parseFloat(rating);
 
-                            if (a>4.0){
+                            if (a > 4.0) {
 
                                 viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg);
-                            }else if (a>3.0){
+                            } else if (a > 3.0) {
 
                                 viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_two);
-                            }else {
+                            } else {
 
                                 viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_three);
                             }
@@ -267,8 +289,6 @@ public class MainActivity extends BaseActivity {
 
             recyclerView.setAdapter(friendsRecyclerView);
 
-
-
             mImageDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -311,7 +331,7 @@ public class MainActivity extends BaseActivity {
             });
 
 
-            img1.setOnClickListener(new View.OnClickListener() {
+          /*  img1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
@@ -411,158 +431,8 @@ public class MainActivity extends BaseActivity {
 
                 }
             });
-
-
-            img3.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    mCartDatabase.child(uId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            if (dataSnapshot.hasChildren()) {
-
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setMessage("Your cart will be empty once you will change the restaurant!")
-                                        .setNegativeButton(android.R.string.no, null)
-                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                            public void onClick(DialogInterface arg0, int arg1) {
-                                                MainActivity.super.onBackPressed();
-
-                                                mCartDatabase.child(uId).removeValue();
-
-
-                                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                                chatIntent.putExtra("restauranr_id", "Kaku Restaurant");
-                                                startActivity(chatIntent);
-                                            }
-                                        }).create().show();
-
-
-                            } else {
-
-                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                chatIntent.putExtra("restauranr_id", "Kaku Restaurant");
-                                startActivity(chatIntent);
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                }
-            });
-
-
-            /*img4.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    mCartDatabase.child(uId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            if (dataSnapshot.hasChildren()) {
-
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setMessage("Your cart will be empty once you will change the restaurant!")
-                                        .setNegativeButton(android.R.string.no, null)
-                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                            public void onClick(DialogInterface arg0, int arg1) {
-                                                MainActivity.super.onBackPressed();
-
-                                                mCartDatabase.child(uId).removeValue();
-
-
-                                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                                chatIntent.putExtra("restauranr_id", "Mazali");
-                                                startActivity(chatIntent);
-                                            }
-                                        }).create().show();
-
-
-                            } else {
-
-                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                chatIntent.putExtra("restauranr_id", "Mazali");
-                                startActivity(chatIntent);
-
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                }
-            });
 */
 
-            img5.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    mCartDatabase.child(uId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                            if (dataSnapshot.hasChildren()) {
-
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setMessage("Your cart will be empty once you will change the restaurant!")
-                                        .setNegativeButton(android.R.string.no, null)
-                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                            public void onClick(DialogInterface arg0, int arg1) {
-                                                MainActivity.super.onBackPressed();
-
-                                                mCartDatabase.child(uId).removeValue();
-
-
-                                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                                chatIntent.putExtra("restauranr_id", "Rawat Bhojanalay");
-                                                startActivity(chatIntent);
-                                            }
-                                        }).create().show();
-
-
-                            } else {
-
-                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                chatIntent.putExtra("restauranr_id", "Rawat Bhojanalay");
-                                startActivity(chatIntent);
-
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-
-                }
-            });
 
         }
 
@@ -586,7 +456,6 @@ public class MainActivity extends BaseActivity {
         outState.putInt(SELECTED_ITEM, mSelectedItem);
         super.onSaveInstanceState(outState);
     }
-
 
     public boolean isNetworkConnectionAvailable() {
         ConnectivityManager cm =
@@ -619,12 +488,12 @@ public class MainActivity extends BaseActivity {
         alertDialog.show();
     }
 
-
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
-        LinearLayout layout_discount,layout_rating;
-        TextView rating;
+        LinearLayout layout_discount, layout_rating;
+        TextView rating, status;
+        LinearLayout main_view;
 
 
         public FriendsViewHolder(View itemView) {
@@ -635,9 +504,10 @@ public class MainActivity extends BaseActivity {
             layout_discount = (LinearLayout) itemView.findViewById(R.id.layout_discount);
             layout_rating = (LinearLayout) itemView.findViewById(R.id.layout_rating);
             rating = (TextView) itemView.findViewById(R.id.rating);
+            main_view = itemView.findViewById(R.id.main_view);
+            status = itemView.findViewById(R.id.status);
 
         }
-
 
         public void setName(String name) {
             TextView userName = (TextView) mView.findViewById(R.id.name);
@@ -651,7 +521,6 @@ public class MainActivity extends BaseActivity {
             fromTxt.setText(from);
 
         }
-
 
         public void setImage(String image) {
 
@@ -684,7 +553,6 @@ public class MainActivity extends BaseActivity {
 
     public class MainSliderAdapter extends SliderAdapter {
 
-
         @Override
         public int getItemCount() {
             return 4;
@@ -710,7 +578,6 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
-
 
 
 }

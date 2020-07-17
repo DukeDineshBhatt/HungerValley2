@@ -5,18 +5,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
+
 import androidx.core.view.MenuItemCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -54,12 +58,13 @@ public class SingleRestaurant extends AppCompatActivity {
     private LinearLayoutManager linearLayoutManager;
     ProgressBar progressBar;
     LinearLayout cartLayout, layout_rating;
-    TextView price, rating;
+    TextView price, rating, status;
 
+    boolean isRestaurantOff = false;
     String uId;
     int count;
     int totalPrice = 0;
-    String bookskey;
+    String bookskey, reasonString;
     boolean isOn;
 
     public static final String MY_PREFS_NAME = "HungerValleyCart";
@@ -81,6 +86,7 @@ public class SingleRestaurant extends AppCompatActivity {
         //item_count = (TextView) findViewById(R.id.item_count);
         price = (TextView) findViewById(R.id.price);
         rating = (TextView) findViewById(R.id.rating);
+        status = (TextView) findViewById(R.id.status);
 
         setSupportActionBar(toolbar);
 
@@ -135,6 +141,17 @@ public class SingleRestaurant extends AppCompatActivity {
                 } else {
 
                     isOn = false;
+
+                    if (dataSnapshot.child("Reason").exists()) {
+
+                        reasonString = dataSnapshot.child("Reason").getValue().toString();
+
+                    } else {
+                        reasonString = " ";
+
+                    }
+
+
                 }
 
             }
@@ -154,6 +171,21 @@ public class SingleRestaurant extends AppCompatActivity {
                 String type = dataSnapshot.child("Restaurant_type").getValue().toString();
                 String res_address = dataSnapshot.child("Address").getValue().toString();
                 String Srating = dataSnapshot.child("Rating").getValue().toString();
+
+                if (dataSnapshot.child("Status").exists()) {
+
+                    isRestaurantOff = true;
+                    status.setVisibility(View.VISIBLE);
+
+                }
+
+                if (dataSnapshot.child("Reason").exists()) {
+
+                    final String reason = dataSnapshot.child("Reason").getValue().toString();
+                    status.setText(reason);
+
+
+                }
 
                 txt_title.setText(restauratId);
                 txt_type.setText(type);
@@ -220,8 +252,15 @@ public class SingleRestaurant extends AppCompatActivity {
                         String food_name = dataSnapshot.child("FoodName").getValue().toString();
                         String food_id = dataSnapshot.child("FoodId").getValue().toString();
 
-                        Log.d("DINESHBHATT", list_menu_id);
+                        if (isRestaurantOff == true) {
 
+                            viewHolder.main_view.setAlpha(0.6f);
+                        } else {
+
+                            viewHolder.main_view.setBackgroundColor(Color.TRANSPARENT);
+                        }
+
+                        Log.d("DINESHBHATT", list_menu_id);
 
                         mCartDatabase.addValueEventListener(new ValueEventListener() {
                             @Override
@@ -278,80 +317,105 @@ public class SingleRestaurant extends AppCompatActivity {
                                         @Override
                                         public void onClick(View view) {
 
-                                            if (isOn) {
-
-                                                if (restauratId.equals(bookskey)) {
-
-                                                    cartLayout.setClickable(false);
-
-                                                    progressBar.setVisibility(View.VISIBLE);
-
-                                                    viewHolder.layout_button.setVisibility(View.VISIBLE);
-                                                    viewHolder.add.setVisibility(View.GONE);
-
-                                                    int count = Integer.parseInt(String.valueOf(viewHolder.textCount.getText()));
-
-                                                    mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List");
-
-                                                    HashMap<String, Object> cartMap = new HashMap<>();
-                                                    cartMap.put("pName", food_name);
-                                                    cartMap.put("price", Integer.parseInt(food_price) * count);
-                                                    cartMap.put("quantity", count);
-                                                    cartMap.put("Type", food_type);
+                                            if (isRestaurantOff == false){
 
 
-                                                    mCartDatabase.child("User View").child(uId).child(restauratId).child(food_name)
-                                                            .updateChildren(cartMap)
-                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                @Override
-                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                if (isOn) {
 
-                                                                    if (task.isSuccessful()) {
+                                                    if (restauratId.equals(bookskey)) {
 
-                                                                        mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
+                                                        cartLayout.setClickable(false);
 
-                                                                        mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        progressBar.setVisibility(View.VISIBLE);
+
+                                                        viewHolder.layout_button.setVisibility(View.VISIBLE);
+                                                        viewHolder.add.setVisibility(View.GONE);
+
+                                                        int count = Integer.parseInt(String.valueOf(viewHolder.textCount.getText()));
+
+                                                        mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List");
+
+                                                        HashMap<String, Object> cartMap = new HashMap<>();
+                                                        cartMap.put("pName", food_name);
+                                                        cartMap.put("price", Integer.parseInt(food_price) * count);
+                                                        cartMap.put("quantity", count);
+                                                        cartMap.put("Type", food_type);
 
 
-                                                                                totalPrice = Integer.parseInt(food_price) + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
+                                                        mCartDatabase.child("User View").child(uId).child(restauratId).child(food_name)
+                                                                .updateChildren(cartMap)
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task) {
 
-                                                                                mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
+                                                                        if (task.isSuccessful()) {
 
-                                                                                cartLayout.setOnClickListener(new View.OnClickListener() {
-                                                                                    @Override
-                                                                                    public void onClick(View v) {
+                                                                            mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
 
-                                                                                        Intent intent = new Intent(SingleRestaurant.this, CartActivity.class);
-                                                                                        startActivity(intent);
+                                                                            mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                                                    }
-                                                                                });
 
-                                                                                progressBar.setVisibility(View.GONE);
+                                                                                    totalPrice = Integer.parseInt(food_price) + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
 
-                                                                            }
+                                                                                    mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
 
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                    cartLayout.setOnClickListener(new View.OnClickListener() {
+                                                                                        @Override
+                                                                                        public void onClick(View v) {
 
-                                                                                progressBar.setVisibility(View.GONE);
-                                                                            }
-                                                                        });
+                                                                                            Intent intent = new Intent(SingleRestaurant.this, CartActivity.class);
+                                                                                            startActivity(intent);
 
+                                                                                        }
+                                                                                    });
+
+                                                                                    progressBar.setVisibility(View.GONE);
+
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                                    progressBar.setVisibility(View.GONE);
+                                                                                }
+                                                                            });
+
+
+                                                                        }
 
                                                                     }
+                                                                });
 
+
+                                                    }
+                                                } else {
+
+                                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
+                                                    builder1.setTitle("Currently not accepting orders");
+                                                    builder1.setMessage(reasonString);
+                                                    builder1.setCancelable(true);
+
+                                                    builder1.setPositiveButton(
+                                                            "Ok",
+                                                            new DialogInterface.OnClickListener() {
+                                                                public void onClick(DialogInterface dialog, int id) {
+                                                                    dialog.cancel();
                                                                 }
                                                             });
 
 
+                                                    AlertDialog alert11 = builder1.create();
+                                                    alert11.show();
                                                 }
-                                            } else {
+
+
+                                            }
+                                            else{
 
                                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
-                                                builder1.setMessage("Currently not accepting orders!");
+                                                builder1.setTitle("This Restaurant is Currently not accepting orders");
                                                 builder1.setCancelable(true);
 
                                                 builder1.setPositiveButton(
@@ -365,8 +429,8 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                                 AlertDialog alert11 = builder1.create();
                                                 alert11.show();
-                                            }
 
+                                            }
 
                                         }
                                     });
@@ -535,76 +599,99 @@ public class SingleRestaurant extends AppCompatActivity {
                                         @Override
                                         public void onClick(View view) {
 
-                                            if (isOn) {
+                                            if (isRestaurantOff == false){
+
+                                                if (isOn) {
+
+                                                    progressBar.setVisibility(View.VISIBLE);
+                                                    cartLayout.setClickable(false);
+
+                                                    viewHolder.layout_button.setVisibility(View.VISIBLE);
+                                                    viewHolder.add.setVisibility(View.GONE);
+
+                                                    int count = Integer.parseInt(String.valueOf(viewHolder.textCount.getText()));
+
+                                                    mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List");
+
+                                                    HashMap<String, Object> cartMap = new HashMap<>();
+                                                    cartMap.put("pName", food_name);
+                                                    cartMap.put("price", Integer.parseInt(food_price) * count);
+                                                    cartMap.put("quantity", count);
+                                                    cartMap.put("Type", food_type);
+
+                                                    mCartDatabase.child("User View").child(uId).child(restauratId).child(food_name)
+                                                            .updateChildren(cartMap)
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                    if (task.isSuccessful()) {
+
+                                                                        mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
+
+                                                                        mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                            @Override
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                                                progressBar.setVisibility(View.VISIBLE);
-                                                cartLayout.setClickable(false);
+                                                                                mCartDatabase.child("Total price").setValue(food_price);
 
-                                                viewHolder.layout_button.setVisibility(View.VISIBLE);
-                                                viewHolder.add.setVisibility(View.GONE);
+                                                                                cartLayout.setVisibility(View.VISIBLE);
+                                                                                progressBar.setVisibility(View.GONE);
+                                                                                cartLayout.setClickable(true);
 
-                                                int count = Integer.parseInt(String.valueOf(viewHolder.textCount.getText()));
+                                                                                cartLayout.setOnClickListener(new View.OnClickListener() {
+                                                                                    @Override
+                                                                                    public void onClick(View v) {
 
-                                                mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List");
+                                                                                        Intent intent = new Intent(SingleRestaurant.this, CartActivity.class);
+                                                                                        startActivity(intent);
 
-                                                HashMap<String, Object> cartMap = new HashMap<>();
-                                                cartMap.put("pName", food_name);
-                                                cartMap.put("price", Integer.parseInt(food_price) * count);
-                                                cartMap.put("quantity", count);
-                                                cartMap.put("Type", food_type);
-
-                                                mCartDatabase.child("User View").child(uId).child(restauratId).child(food_name)
-                                                        .updateChildren(cartMap)
-                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                                                if (task.isSuccessful()) {
-
-                                                                    mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
-
-                                                                    mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                        @Override
-                                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                                    }
+                                                                                });
 
 
-                                                                            mCartDatabase.child("Total price").setValue(food_price);
+                                                                            }
 
-                                                                            cartLayout.setVisibility(View.VISIBLE);
-                                                                            progressBar.setVisibility(View.GONE);
-                                                                            cartLayout.setClickable(true);
-
-                                                                            cartLayout.setOnClickListener(new View.OnClickListener() {
-                                                                                @Override
-                                                                                public void onClick(View v) {
-
-                                                                                    Intent intent = new Intent(SingleRestaurant.this, CartActivity.class);
-                                                                                    startActivity(intent);
-
-                                                                                }
-                                                                            });
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                                progressBar.setVisibility(View.GONE);
+                                                                            }
+                                                                        });
 
 
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            progressBar.setVisibility(View.GONE);
-                                                                        }
-                                                                    });
-
+                                                                    }
 
                                                                 }
-
-                                                            }
-                                                        });
+                                                            });
 
 
-                                            } else {
+                                                } else {
+
+                                                    AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
+                                                    builder1.setTitle("Currently not accepting orders");
+                                                    builder1.setMessage(reasonString);
+                                                    builder1.setCancelable(true);
+
+                                                    builder1.setPositiveButton(
+                                                            "Ok",
+                                                            new DialogInterface.OnClickListener() {
+                                                                public void onClick(DialogInterface dialog, int id) {
+                                                                    dialog.cancel();
+                                                                }
+                                                            });
+
+
+                                                    AlertDialog alert11 = builder1.create();
+                                                    alert11.show();
+
+                                                }
+
+                                            }
+                                            else{
 
                                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
-                                                builder1.setMessage("Currently not accepting orders!");
+                                                builder1.setTitle("This Restaurant is Currently not accepting orders");
                                                 builder1.setCancelable(true);
 
                                                 builder1.setPositiveButton(
@@ -620,6 +707,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                 alert11.show();
 
                                             }
+
 
 
                                         }
@@ -804,6 +892,7 @@ public class SingleRestaurant extends AppCompatActivity {
         TextView textCount, price;
         ImageView type_image;
         LinearLayout layout_button;
+        LinearLayout main_view;
 
         public FriendsViewHolder(View itemView) {
             super(itemView);
@@ -817,6 +906,7 @@ public class SingleRestaurant extends AppCompatActivity {
             price = (TextView) itemView.findViewById(R.id.price);
             type_image = (ImageView) itemView.findViewById(R.id.type_image);
             layout_button = (LinearLayout) itemView.findViewById(R.id.layout_button);
+            main_view = itemView.findViewById(R.id.main_view);
 
         }
 

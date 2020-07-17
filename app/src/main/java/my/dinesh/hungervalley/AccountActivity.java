@@ -171,7 +171,7 @@ public class AccountActivity extends BaseActivity {
                         }
 
 
-                        price.setText("Rs " + dataSnapshot1.getValue().toString());
+                        price.setText(" Rs " + dataSnapshot1.getValue().toString());
 
                     }
 

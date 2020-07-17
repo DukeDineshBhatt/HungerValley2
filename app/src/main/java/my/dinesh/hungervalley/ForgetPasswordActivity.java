@@ -29,6 +29,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -36,6 +38,16 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ForgetPasswordActivity extends AppCompatActivity {
 
@@ -46,8 +58,10 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     Button btn, change;
     ProgressBar progressBar;
     LinearLayout layout_two;
-    String temp_key, txt;
+    String temp_key, txt,base;
     int randomNumber;
+    DatabaseReference mOtpdatabase;
+    String sender_id,message,authorization;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +96,22 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         DatabaseReference usersRef = database.getReference("Users");
+        mOtpdatabase  = database.getReference("Admin").child("OTP");
+
+        mOtpdatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                sender_id = dataSnapshot.child("sender_id").getValue().toString();
+                message = dataSnapshot.child("message").getValue().toString();
+                authorization = dataSnapshot.child("authorization").getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +121,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 txt = mobile.getText().toString().trim();
+
 
 
                 if (txt.isEmpty() || txt.length() < 10) {
@@ -110,73 +141,91 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
                             if (dataSnapshot.hasChild(txt)) {
 
-                /*mRequestDatabase.child(txt).child("key").setValue(getSaltString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                  @Override
-                  public void onComplete(@NonNull Task<Void> task) {
 
-                    mRequestDatabase.child(txt).child("key").addListenerForSingleValueEvent(new ValueEventListener() {
-                      @Override
-                      public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Random random = new Random();
+                                randomNumber = random.nextInt(99999);
 
-                        layout_two.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
+                                Application b = (Application) getApplicationContext();
 
+                                HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                                logging.level(HttpLoggingInterceptor.Level.HEADERS);
+                                logging.level(HttpLoggingInterceptor.Level.BODY);
 
-                        change.setOnClickListener(new View.OnClickListener() {
-                          @Override
-                          public void onClick(View v) {
+                                OkHttpClient client = new OkHttpClient.Builder().writeTimeout(1000, TimeUnit.SECONDS).readTimeout(1000, TimeUnit.SECONDS).connectTimeout(1000, TimeUnit.SECONDS).addInterceptor(logging).build();
 
-                            mRequestDatabase.child(txt).addListenerForSingleValueEvent(new ValueEventListener() {
-                              @Override
-                              public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                base = b.baseurl;
 
-                                temp_key = key.getText().toString().trim();
-                                String s = dataSnapshot.child("key").getValue().toString().trim();
+                                Retrofit retrofit = new Retrofit.Builder()
+                                        .baseUrl(b.baseurl)
+                                        .client(client)
+                                        .addConverterFactory(ScalarsConverterFactory.create())
+                                        .addConverterFactory(GsonConverterFactory.create())
+                                        .build();
 
-                                if (temp_key.isEmpty()) {
-
-                                  Toast.makeText(ForgetPasswordActivity.this, "Enter key", Toast.LENGTH_SHORT).show();
+                                AllApiIneterface cr = retrofit.create(AllApiIneterface.class);
 
 
-                                } else if (s.equals(temp_key)) {
+                                Call<OtpBean> call = cr.getOtp(sender_id, "english", "qt", mobile.getText().toString(),
+                                        message, "{#AA#}", String.valueOf(randomNumber), authorization);
+                                call.enqueue(new Callback<OtpBean>() {
+                                    @Override
+                                    public void onResponse(@NotNull Call<OtpBean> call, @NotNull Response<OtpBean> response) {
 
-                                  Intent intent = new Intent(ForgetPasswordActivity.this, ResetPasswordActivity.class);
-                                  intent.putExtra("userid", txt);
-                                  startActivity(intent);
-                                } else {
-
-                                  Toast.makeText(ForgetPasswordActivity.this, "Incorrect key", Toast.LENGTH_SHORT).show();
-
-
-                                }
+                                        if (response.body().getMessage().get(0).equals("Message sent successfully")) {
 
 
-                              }
+                                            layout_two.setVisibility(View.VISIBLE);
+                                            progressBar.setVisibility(View.GONE);
 
-                              @Override
-                              public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            change.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
 
-                              }
-                            });
+                                                    if (randomNumber == Integer.valueOf(editTextOtp.getText().toString())) {
+
+                                                        Intent intent = new Intent(ForgetPasswordActivity.this, ResetPasswordActivity.class);
+                                                        intent.putExtra("userid", txt);
+                                                        startActivity(intent);
+
+                                                    } else {
+                                                        progressBar.setVisibility(View.GONE);
+                                                        Toast.makeText(getApplicationContext(), "wrong Reset Key", Toast.LENGTH_LONG).show();
+                                                    }
 
 
-                          }
-                        });
+                                                }
+                                            });
 
 
-                      }
 
-                      @Override
-                      public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                      }
-                    });
+                                           /* Intent intent = new Intent(SignupActivity.this, OTP.class);
+                                            intent.putExtra("OTP", randomNumber);
+                                            intent.putExtra("username", username);
+                                            intent.putExtra("password", password);
+                                            intent.putExtra("mobile", mobile);
+                                            startActivity(intent);*/
 
-                  }
-                });
+                                        } else {
+                                            Toast.makeText(ForgetPasswordActivity.this, "Please try again", Toast.LENGTH_SHORT).show();
 
-*/
-                                try {
+                                        }
+
+                                        progressBar.setVisibility(View.GONE);
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<OtpBean> call, Throwable t) {
+                                        progressBar.setVisibility(View.GONE);
+                                        Toast.makeText(ForgetPasswordActivity.this, "Some error occured, Try agian", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+
+
+
+                                 /* try {
                                     // Construct data
                                     //int randomNumber;
                                     String apiKey = "apikey=" + "C5ksL1aQZqQ-aoi8riQqvQtwzjQkjfC99pZuoPp9Zf";
@@ -233,7 +282,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "ERROR SENDING OTP TO THIS NUMBER!", Toast.LENGTH_LONG).show();
 
 
-                                }
+                                }*/
 
 
                             } else {
@@ -262,16 +311,4 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
     }
 
-    protected String getSaltString() {
-        String SALTCHARS = "ABcDeFGHIJKLmNOpQRSTUVWxYZ1234567890";
-        StringBuilder salt = new StringBuilder();
-        Random rnd = new Random();
-        while (salt.length() < 5) { // length of the random string.
-            int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-            salt.append(SALTCHARS.charAt(index));
-        }
-        String saltStr = salt.toString();
-        return saltStr;
-
-    }
 }
