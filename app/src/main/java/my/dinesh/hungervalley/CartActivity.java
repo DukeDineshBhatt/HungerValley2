@@ -8,9 +8,11 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,8 +42,10 @@ public class CartActivity extends BaseActivity {
     RelativeLayout layout;
     String uId, restaurantId;
     int flags, discount_int, final_total_price, intent_total_price;
+    int tax_total = 0;
+    TextView package_fee, txt_package_fee;
 
-    DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase;
+    DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase, mAdmindatabase;
 
     MyAdapter adapter;
     TextView restaurant, total_price, to_pay, discount;
@@ -64,6 +68,8 @@ public class CartActivity extends BaseActivity {
         discount = (TextView) findViewById(R.id.discount);
         place = (Button) findViewById(R.id.place);
         banner = (ImageView) findViewById(R.id.banner);
+        package_fee = (findViewById(R.id.package_fee));
+        txt_package_fee = (findViewById(R.id.txt_package_fees));
 
         flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
@@ -82,10 +88,72 @@ public class CartActivity extends BaseActivity {
 
         mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View");
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
-
+        mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin");
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
 
+        mAdmindatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                txt_package_fee.setText(dataSnapshot.child("Fee Name").getValue().toString());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+        mUserDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.child("Address").exists()) {
+
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    String location = dataSnapshot.child("Address").child("location").getValue().toString();
+
+                    mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
+                    mAdmindatabase.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+                                if (areaSnapshot.child("areaName").getValue().toString().equals(location)) {
+
+
+                                    package_fee.setText(areaSnapshot.child("areaPrice").getValue().toString());
+
+                                    progressBar.setVisibility(View.GONE);
+                                }
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+                    });
+
+
+                } else {
+                    package_fee.setText("20");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressBar.setVisibility(View.GONE);
+
+            }
+        });
 
         mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -115,7 +183,6 @@ public class CartActivity extends BaseActivity {
 
                         }
                     });
-
 
 
                     SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);

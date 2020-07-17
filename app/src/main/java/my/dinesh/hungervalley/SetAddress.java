@@ -3,10 +3,14 @@ package my.dinesh.hungervalley;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,8 +23,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +41,7 @@ public class SetAddress extends AppCompatActivity {
     Spinner spinner;
     EditText locality, landmark, mobile;
     DatabaseReference mUserDatabase;
+    DatabaseReference mAdminDatabase;
     String uId;
     String selectedItemText;
     Button save;
@@ -67,6 +75,63 @@ public class SetAddress extends AppCompatActivity {
         uId = (shared.getString("user_id", ""));
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
+        mAdminDatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
+
+
+        mAdminDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                final List<String> areas = new ArrayList<String>();
+
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String areaName = areaSnapshot.child("areaName").getValue(String.class);
+                    areas.add(areaName);
+                }
+                // ArrayAdapter<String> areasAdapter = new ArrayAdapter<String>(SetAddress.this, android.R.layout.simple_spinner_item, areas);
+                //areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                //spinner.setAdapter(areasAdapter);
+
+
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(SetAddress.this, R.layout.spinner_item, areas) {
+                    @Override
+                    public boolean isEnabled(int position) {
+                        if (position == 0) {
+                            // Disable the first item from Spinner
+                            // First item will be use for hint
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public View getDropDownView(int position, View convertView,
+                                                ViewGroup parent) {
+                        View view = super.getDropDownView(position, convertView, parent);
+                        TextView tv = (TextView) view;
+                        if (position == 0) {
+                            // Set the hint text color gray
+                            tv.setTextColor(Color.GRAY);
+                        } else {
+                            tv.setTextColor(Color.BLACK);
+                        }
+                        return view;
+                    }
+
+
+                };
+
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+                spinner.setAdapter(spinnerArrayAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         // Initializing a String Array
         String[] plants = new String[]{
@@ -95,7 +160,7 @@ public class SetAddress extends AppCompatActivity {
 
         };
 
-        final List<String> plantsList = new ArrayList<>(Arrays.asList(plants));
+        /*final List<String> plantsList = new ArrayList<>(Arrays.asList(plants));
 
         // Initializing an ArrayAdapter
         final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
@@ -127,10 +192,12 @@ public class SetAddress extends AppCompatActivity {
         };
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         spinner.setAdapter(spinnerArrayAdapter);
+*/
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
                 selectedItemText = (String) parent.getItemAtPosition(position);
                 // If user change the default selection
                 // First item is disable and it is used for hint

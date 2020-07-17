@@ -42,6 +42,7 @@ public class EditAddress extends AppCompatActivity {
     String selectedItemText;
     Button save;
     ProgressBar progressbar;
+    DatabaseReference mAdminDatabase;
 
     String location;
 
@@ -62,6 +63,8 @@ public class EditAddress extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+        mAdminDatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
 
 
         // Get reference of widgets from XML layout
@@ -101,8 +104,65 @@ public class EditAddress extends AppCompatActivity {
             }
         });
 
+        mAdminDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                final List<String> areas = new ArrayList<String>();
+
+                for (DataSnapshot areaSnapshot: dataSnapshot.getChildren()) {
+                    String areaName = areaSnapshot.child("areaName").getValue(String.class);
+                    areas.add(areaName);
+                }
+                // ArrayAdapter<String> areasAdapter = new ArrayAdapter<String>(SetAddress.this, android.R.layout.simple_spinner_item, areas);
+                //areasAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                //spinner.setAdapter(areasAdapter);
+
+
+                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(EditAddress.this, R.layout.spinner_item, areas) {
+                    @Override
+                    public boolean isEnabled(int position) {
+                        if (position == 0) {
+                            // Disable the first item from Spinner
+                            // First item will be use for hint
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public View getDropDownView(int position, View convertView,
+                                                ViewGroup parent) {
+                        View view = super.getDropDownView(position, convertView, parent);
+                        TextView tv = (TextView) view;
+                        if (position == 0) {
+                            // Set the hint text color gray
+                            tv.setTextColor(Color.GRAY);
+                        } else {
+                            tv.setTextColor(Color.BLACK);
+                        }
+                        return view;
+                    }
+
+
+                };
+
+                spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+                spinner.setAdapter(spinnerArrayAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
         // Initializing a String Array
-        String[] plants = new String[]{
+        /*String[] plants = new String[]{
                 "Choose Location",
                 "Ancholi (near bridge)",
                 "Aps Road",
@@ -131,8 +191,8 @@ public class EditAddress extends AppCompatActivity {
 
 
         };
-
-        List<String> plantsList = new ArrayList<>(Arrays.asList(plants));
+*/
+        /*List<String> plantsList = new ArrayList<>(Arrays.asList(plants));
 
         // Initializing an ArrayAdapter
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
@@ -164,7 +224,7 @@ public class EditAddress extends AppCompatActivity {
         };
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         spinner.setAdapter(spinnerArrayAdapter);
-
+*/
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
