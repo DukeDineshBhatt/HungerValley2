@@ -40,6 +40,7 @@ public class ConfirmOrder extends AppCompatActivity {
     DatabaseReference mOrderDatabase, mAdminOrdreDatabase, mAdminDatabase, mRestaurantDatabase;
 
     String pName, price, qty, s;
+    int tax_price;
 
     String tempPrice;
     boolean isDiscount = false;
@@ -82,6 +83,8 @@ public class ConfirmOrder extends AppCompatActivity {
         uId = (shared.getString("user_id", ""));
         restaurantId = (shared.getString("restaurant", ""));
 
+        Intent mIntent = getIntent();
+        tax_price = mIntent.getIntExtra("tax_price", 0);
 
         mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(restaurantId);
 
@@ -130,7 +133,7 @@ public class ConfirmOrder extends AppCompatActivity {
 
                     int a = Integer.parseInt(to_pay.getText().toString());
 
-                    fValue = a + 20;
+                    fValue = a + tax_price;
                     fValue = fValue - discountPrice;
                     to_pay.setText(String.valueOf(fValue));
 
@@ -144,7 +147,7 @@ public class ConfirmOrder extends AppCompatActivity {
 
                     int a = Integer.parseInt(to_pay.getText().toString());
 
-                    fValue = a + 20;
+                    fValue = a + tax_price;
 
                     to_pay.setText(String.valueOf(fValue));
 

@@ -66,6 +66,7 @@ public class SingleRestaurant extends AppCompatActivity {
     int totalPrice = 0;
     String bookskey, reasonString;
     boolean isOn;
+    boolean isFoodAvailabe = true;
 
     public static final String MY_PREFS_NAME = "HungerValleyCart";
 
@@ -252,12 +253,21 @@ public class SingleRestaurant extends AppCompatActivity {
                         String food_name = dataSnapshot.child("FoodName").getValue().toString();
                         String food_id = dataSnapshot.child("FoodId").getValue().toString();
 
+
                         if (isRestaurantOff == true) {
 
                             viewHolder.main_view.setAlpha(0.6f);
                         } else {
 
                             viewHolder.main_view.setBackgroundColor(Color.TRANSPARENT);
+                        }
+
+                        if (dataSnapshot.child("Status").exists()) {
+                            isFoodAvailabe = false;
+                            viewHolder.add.setText(dataSnapshot.child("Status").getValue().toString());
+                            viewHolder.add.setEnabled(false);
+                            viewHolder.main_view.setAlpha(0.6f);
+
                         }
 
                         Log.d("DINESHBHATT", list_menu_id);
@@ -273,7 +283,6 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                     viewHolder.textCount.setText(dataSnapshot.child(restauratId).child(food_name).child("quantity").getValue().toString());
                                     //int count = Integer.parseInt(String.valueOf(viewHolder.textCount.getText()));
-
 
                                 }
 
@@ -317,10 +326,11 @@ public class SingleRestaurant extends AppCompatActivity {
                                         @Override
                                         public void onClick(View view) {
 
-                                            if (isRestaurantOff == false){
+                                            if (isRestaurantOff == false) {
 
 
                                                 if (isOn) {
+
 
                                                     if (restauratId.equals(bookskey)) {
 
@@ -390,6 +400,8 @@ public class SingleRestaurant extends AppCompatActivity {
 
 
                                                     }
+
+
                                                 } else {
 
                                                     AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
@@ -411,8 +423,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                 }
 
 
-                                            }
-                                            else{
+                                            } else {
 
                                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
                                                 builder1.setTitle("This Restaurant is Currently not accepting orders");
@@ -599,7 +610,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                         @Override
                                         public void onClick(View view) {
 
-                                            if (isRestaurantOff == false){
+                                            if (isRestaurantOff == false) {
 
                                                 if (isOn) {
 
@@ -687,8 +698,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                                 }
 
-                                            }
-                                            else{
+                                            } else {
 
                                                 AlertDialog.Builder builder1 = new AlertDialog.Builder(SingleRestaurant.this);
                                                 builder1.setTitle("This Restaurant is Currently not accepting orders");
@@ -707,7 +717,6 @@ public class SingleRestaurant extends AppCompatActivity {
                                                 alert11.show();
 
                                             }
-
 
 
                                         }

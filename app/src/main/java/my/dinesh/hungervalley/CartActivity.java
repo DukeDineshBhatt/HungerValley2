@@ -106,7 +106,6 @@ public class CartActivity extends BaseActivity {
             }
         });
 
-
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -165,27 +164,29 @@ public class CartActivity extends BaseActivity {
                     layout_empty.setVisibility(View.INVISIBLE);
                     layout.setVisibility(View.VISIBLE);
 
-                    mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    if (dataSnapshot.child("Total price").exists()) {
+
+                        intent_total_price = Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
+
+                    } else {
+
+                        mCartDatabase.child("Total price").setValue(intent_total_price);
+                    }
+
+                   /* mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.child("Total price").exists()) {
 
-                                intent_total_price = Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
 
-                            } else {
-
-                                mCartDatabase.child("Total price").setValue(intent_total_price);
-                            }
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
 
                         }
-                    });
+                    });*/
 
-
-                    SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
+                   SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
                     restaurantId = (shared.getString("restaurant", ""));
 
                     restaurant.setText(restaurantId);
@@ -219,7 +220,6 @@ public class CartActivity extends BaseActivity {
 
                     mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId).child(restaurantId);
 
-
                     mCartListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -236,7 +236,8 @@ public class CartActivity extends BaseActivity {
                                         total_price.setText(dataSnapshot.child("Total price").getValue().toString());
 
                                         int a = Integer.parseInt(total_price.getText().toString());
-                                        int f = a + 20;
+
+                                        int f = a + Integer.parseInt(package_fee.getText().toString());
 
                                         mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -325,6 +326,7 @@ public class CartActivity extends BaseActivity {
 
                             Intent intent = new Intent(CartActivity.this, ConfirmOrder.class);
 
+                            intent.putExtra("tax_price",Integer.parseInt(package_fee.getText().toString()));
                             startActivity(intent);
 
                         } else {
