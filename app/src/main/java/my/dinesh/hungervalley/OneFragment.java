@@ -42,7 +42,7 @@ public class OneFragment extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
 
 
-        FirebaseRecyclerAdapter<MyDataSetGet, MainActivity.FriendsViewHolder> friendsRecyclerView = new FirebaseRecyclerAdapter<MyDataSetGet, MainActivity.FriendsViewHolder>(
+        /*FirebaseRecyclerAdapter<MyDataSetGet, MainActivity.FriendsViewHolder> friendsRecyclerView = new FirebaseRecyclerAdapter<MyDataSetGet, MainActivity.FriendsViewHolder>(
 
                 MyDataSetGet.class,
                 R.layout.list_feed_item,
@@ -77,7 +77,7 @@ public class OneFragment extends Fragment {
         };
 
         recyclerView.setAdapter(friendsRecyclerView);
-
+*/
 
 
 

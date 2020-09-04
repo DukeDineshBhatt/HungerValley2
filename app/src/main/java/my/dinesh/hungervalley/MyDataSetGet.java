@@ -1,39 +1,72 @@
 package my.dinesh.hungervalley;
 
 public class MyDataSetGet {
-    String name, type, image_url;
+
+
+    String Restaurant_name, Restaurant_type, Status, Banner;
+
+    double Rating;
+    int Discount;
 
     public MyDataSetGet() {
 
     }
 
-    public MyDataSetGet(String name, String type, String image_url) {
-        this.name = name;
-        this.type = type;
-        this.image_url = image_url;
+    public MyDataSetGet(String restaurant_name, String restaurant_type, String status, String banner, double rating, int discount) {
+        Restaurant_name = restaurant_name;
+        Restaurant_type = restaurant_type;
+        Status = status;
+        Banner = banner;
+        Rating = rating;
+        Discount = discount;
     }
 
-    public String getName() {
-        return name;
+    public String getRestaurant_name() {
+        return Restaurant_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setRestaurant_name(String Restaurant_name) {
+        Restaurant_name = Restaurant_name;
     }
 
-    public String getType() {
-        return type;
+    public String getRestaurant_type() {
+        return Restaurant_type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setRestaurant_type(String restaurant_type) {
+        Restaurant_type = restaurant_type;
     }
 
-    public String getImage_url() {
-        return image_url;
+    public double getRating() {
+        return Rating;
     }
 
-    public void setImage_url(String image_url) {
-        this.image_url = image_url;
+    public void setRating(double rating) {
+        Rating = rating;
+    }
+
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
+    public String getBanner() {
+        return Banner;
+    }
+
+    public void setBanner(String banner) {
+        Banner = banner;
+    }
+
+    public int getDiscount() {
+        return Discount;
+    }
+
+    public void setDiscount(int discount) {
+        Discount = discount;
     }
 }

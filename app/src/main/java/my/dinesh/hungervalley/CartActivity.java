@@ -42,11 +42,10 @@ public class CartActivity extends BaseActivity {
     RelativeLayout layout;
     String uId, restaurantId;
     int flags, discount_int, final_total_price, intent_total_price;
-    int tax_total = 0;
     TextView package_fee, txt_package_fee;
 
     DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase, mAdmindatabase;
-
+    String location;
     MyAdapter adapter;
     TextView restaurant, total_price, to_pay, discount;
 
@@ -90,8 +89,6 @@ public class CartActivity extends BaseActivity {
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
         mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin");
 
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
-
         mAdmindatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -106,6 +103,11 @@ public class CartActivity extends BaseActivity {
             }
         });
 
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
+        mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
+
+
+
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -114,16 +116,14 @@ public class CartActivity extends BaseActivity {
 
                     progressBar.setVisibility(View.VISIBLE);
 
-                    String location = dataSnapshot.child("Address").child("location").getValue().toString();
+                    location = dataSnapshot.child("Address").child("location").getValue().toString();
 
-                    mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
                     mAdmindatabase.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                             for (DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
                                 if (areaSnapshot.child("areaName").getValue().toString().equals(location)) {
-
 
                                     package_fee.setText(areaSnapshot.child("areaPrice").getValue().toString());
 
@@ -186,7 +186,7 @@ public class CartActivity extends BaseActivity {
                         }
                     });*/
 
-                   SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
+                    SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
                     restaurantId = (shared.getString("restaurant", ""));
 
                     restaurant.setText(restaurantId);
@@ -326,7 +326,7 @@ public class CartActivity extends BaseActivity {
 
                             Intent intent = new Intent(CartActivity.this, ConfirmOrder.class);
 
-                            intent.putExtra("tax_price",Integer.parseInt(package_fee.getText().toString()));
+                            intent.putExtra("tax_price", Integer.parseInt(package_fee.getText().toString()));
                             startActivity(intent);
 
                         } else {

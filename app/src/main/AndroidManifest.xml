@@ -16,23 +16,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".Product"
+            android:parentActivityName=".SubCategory"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".SubCategory"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".OTP"
             android:parentActivityName=".SignupActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-        <activity android:name=".YoutubeActivity"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".YoutubeActivity" />
         <activity
             android:name=".FeedActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ResetPasswordActivity"
             android:parentActivityName=".ForgetPasswordActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ForgetPasswordActivity"
             android:parentActivityName=".LoginActivity"
@@ -69,13 +71,11 @@
         <activity
             android:name=".SplashActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".SingleRestaurant"
