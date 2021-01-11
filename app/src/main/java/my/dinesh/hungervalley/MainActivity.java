@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -177,8 +178,7 @@ public class MainActivity extends BaseActivity {
         //recyclerView.setHasFixedSize(true);
         //recyclerView.setNestedScrollingEnabled(false);
 
-        GridLayoutManager manager5 = new GridLayoutManager(this, 3);
-        cat.setLayoutManager(manager5);
+        cat.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         //cat.setHasFixedSize(true);
         //cat.setNestedScrollingEnabled(false);
 
@@ -189,7 +189,7 @@ public class MainActivity extends BaseActivity {
 
             FirebaseRecyclerOptions<CatSetGet> options =
                     new FirebaseRecyclerOptions.Builder<CatSetGet>()
-                            .setQuery(FirebaseDatabase.getInstance().getReference().child("Groceries").child("Categories"), CatSetGet.class)
+                            .setQuery(FirebaseDatabase.getInstance().getReference().child("Categories"), CatSetGet.class)
                             .build();
 
 
@@ -206,137 +206,6 @@ public class MainActivity extends BaseActivity {
             recyclerView.setAdapter(adapter1);
 
 
-            /*FirebaseRecyclerAdapter<MyDataSetGet, FriendsViewHolder> friendsRecyclerView1 = new FirebaseRecyclerAdapter<MyDataSetGet, FriendsViewHolder>(
-
-                    MyDataSetGet.class,
-                    R.layout.list_item_single,
-                    FriendsViewHolder.class,
-                    mRestaurantDatabase
-
-            ) {
-                @Override
-                protected void populateViewHolder(final FriendsViewHolder viewHolder, MyDataSetGet model, int position) {
-
-                    final String list_user_id = getRef(position).getKey();
-
-                    mRestaurantDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            final String name = dataSnapshot.child("Restaurant_name").getValue().toString();
-                            final String type = dataSnapshot.child("Restaurant_type").getValue().toString();
-                            final String image = dataSnapshot.child("Banner").getValue().toString();
-                            final String rating = dataSnapshot.child("Rating").getValue().toString();
-
-
-                            if (dataSnapshot.child("Status").exists()) {
-
-                                viewHolder.main_view.setAlpha(0.6f);
-
-                            }
-
-                            if (dataSnapshot.child("Reason").exists()) {
-
-                                viewHolder.status.setVisibility(View.VISIBLE);
-                                final String reason = dataSnapshot.child("Reason").getValue().toString();
-                                viewHolder.status.setText(reason);
-
-
-                            }
-
-                            if (dataSnapshot.child("Discount").exists()) {
-
-                                viewHolder.layout_discount.setVisibility(View.VISIBLE);
-
-
-                            } else {
-
-                                viewHolder.layout_discount.setVisibility(View.GONE);
-                            }
-
-
-                            float a = Float.parseFloat(rating);
-
-                            if (a > 4.0) {
-
-                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg);
-                            } else if (a > 3.0) {
-
-                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_two);
-                            } else {
-
-                                viewHolder.layout_rating.setBackgroundResource(R.drawable.star_bg_three);
-                            }
-
-                            viewHolder.setName(name);
-                            viewHolder.setFrom(type);
-                            viewHolder.setImage(image);
-                            viewHolder.rating.setText(rating);
-
-                            viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-
-                                    mCartDatabase.child(uId).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                            if (dataSnapshot.hasChildren()) {
-
-                                                new AlertDialog.Builder(MainActivity.this)
-                                                        .setMessage("Your cart will be empty once you will change the restaurant!")
-                                                        .setNegativeButton(android.R.string.no, null)
-                                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                                                            public void onClick(DialogInterface arg0, int arg1) {
-                                                                MainActivity.super.onBackPressed();
-
-                                                                mCartDatabase.child(uId).removeValue();
-
-                                                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                                                final String s = ((Application) getApplicationContext()).setSomeVariable(list_user_id);
-                                                                chatIntent.putExtra("restauranr_id", list_user_id);
-                                                                startActivity(chatIntent);
-                                                            }
-                                                        }).create().show();
-
-
-                                            } else {
-
-                                                Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
-                                                final String s = ((Application) getApplicationContext()).setSomeVariable(list_user_id);
-                                                chatIntent.putExtra("restauranr_id", list_user_id);
-                                                startActivity(chatIntent);
-
-
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-
-                                }
-                            });
-
-                            progressBar.setVisibility(View.GONE);
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-
-                }
-            };
-*/
             mImageDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -406,10 +275,10 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onClick(View view) {
 
-                    Intent intent = new Intent(MainActivity.this,SubCategory.class);
-                    intent.putExtra("pos",position);
-                    intent.putExtra("cat_id",model.getName());
-                    intent.putExtra("image",model.getImage());
+                    Intent intent = new Intent(MainActivity.this, SubCategory.class);
+                    intent.putExtra("pos", position);
+                    intent.putExtra("cat_id", model.getName());
+                    intent.putExtra("image", model.getImage());
                     startActivity(intent);
 
                 }
@@ -445,12 +314,8 @@ public class MainActivity extends BaseActivity {
         @Override
         protected void onBindViewHolder(@NonNull mainAdapter.myviewholder holder, int position, @NonNull MyDataSetGet model) {
 
-           // final MyDataSetGet item = list.get(position);
-
             holder.name.setText(model.getRestaurant_name());
             holder.type.setText(model.getRestaurant_type());
-
-           // Rname = holder.name.getText().toString();
 
 
             Rname = model.getRestaurant_name().toString();
@@ -520,7 +385,7 @@ public class MainActivity extends BaseActivity {
 
                                                 Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
                                                 //final String s = ((Application) getApplicationContext()).setSomeVariable(Rname);
-                                                chatIntent.putExtra("restauranr_id",model.Restaurant_name);
+                                                chatIntent.putExtra("restauranr_id", model.Restaurant_name);
                                                 startActivity(chatIntent);
                                             }
                                         }).create().show();
@@ -530,7 +395,7 @@ public class MainActivity extends BaseActivity {
 
                                 Intent chatIntent = new Intent(MainActivity.this, SingleRestaurant.class);
                                 //final String s = ((Application) getApplicationContext()).setSomeVariable(Rname);
-                                chatIntent.putExtra("restauranr_id",model.Restaurant_name);
+                                chatIntent.putExtra("restauranr_id", model.Restaurant_name);
                                 startActivity(chatIntent);
 
 
@@ -576,7 +441,6 @@ public class MainActivity extends BaseActivity {
                 main_view = itemView.findViewById(R.id.main_view);
                 status = itemView.findViewById(R.id.status);
                 image = itemView.findViewById(R.id.image);
-
 
 
                 mView = itemView;

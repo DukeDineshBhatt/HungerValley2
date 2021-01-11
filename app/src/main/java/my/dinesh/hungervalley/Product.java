@@ -100,7 +100,7 @@ public class Product extends AppCompatActivity {
         }
 
         @Override
-        protected void onBindViewHolder(@NonNull myadapter.myviewholder holder, int position, @NonNull ProductModel model) {
+        protected void onBindViewHolder(@NonNull myviewholder holder, int position, @NonNull ProductModel model) {
 
             holder.name.setText(model.getName());
 
@@ -128,9 +128,9 @@ public class Product extends AppCompatActivity {
 
         @NonNull
         @Override
-        public myadapter.myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_list_model, parent, false);
-            return new myadapter.myviewholder(view);
+            return new myviewholder(view);
         }
 
         class myviewholder extends RecyclerView.ViewHolder {

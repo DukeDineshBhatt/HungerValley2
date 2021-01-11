@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-public class FeedActivity extends BaseActivity {
+public class FeedActivity extends AppCompatActivity {
 
 
     int flags;
@@ -43,6 +44,8 @@ public class FeedActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_feed);
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
@@ -284,7 +287,7 @@ public class FeedActivity extends BaseActivity {
     }
 
 
-    @Override
+ /*   @Override
     public void onBackPressed() {
 
         Intent intent = new Intent(FeedActivity.this, MainActivity.class);
@@ -302,5 +305,5 @@ public class FeedActivity extends BaseActivity {
     @Override
     int getNavigationMenuItemId() {
         return R.id.feed;
-    }
+    }*/
 }

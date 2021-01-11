@@ -12,9 +12,11 @@
         android:title="Cart" />
 
     <item
-        android:id="@+id/feed"
+        android:id="@+id/order"
         android:icon="@drawable/ic_action_feed"
-        android:title="Feed" />
+        android:title="Order" />
+
+
 
     <item
         android:id="@+id/account"

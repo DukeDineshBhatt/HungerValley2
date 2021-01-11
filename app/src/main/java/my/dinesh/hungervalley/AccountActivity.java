@@ -23,7 +23,6 @@ import com.google.firebase.database.ValueEventListener;
 public class AccountActivity extends BaseActivity {
 
     Button btn_login;
-    LinearLayout order_layout;
     TextView textViewUsername, textViewPhone, txt_location, txt_locality, txt_landmark, price, no_order,mailText;
     int flags;
     LinearLayout address;
@@ -42,7 +41,6 @@ public class AccountActivity extends BaseActivity {
         txt_location = (TextView) findViewById(R.id.location);
         txt_locality = (TextView) findViewById(R.id.locality);
         txt_landmark = (TextView) findViewById(R.id.landmark);
-        no_order = (TextView) findViewById(R.id.no_order);
         price = (TextView) findViewById(R.id.price);
         address = (LinearLayout) findViewById(R.id.address);
         add_address = (Button) findViewById(R.id.add_address);
@@ -52,7 +50,6 @@ public class AccountActivity extends BaseActivity {
         btn_login = (Button) findViewById(R.id.btn_login);
         //delete_address = (Button) findViewById(R.id.delete);
         logout_layout = (LinearLayout) findViewById(R.id.logout_layout);
-        order_layout = (LinearLayout) findViewById(R.id.order_layout);
         txt = (TextView) findViewById(R.id.txt);
         mailText = (TextView) findViewById(R.id.mailText);
 
@@ -152,7 +149,7 @@ public class AccountActivity extends BaseActivity {
             }
         });
 
-        mOrderDatabase.addValueEventListener(new ValueEventListener() {
+        /*mOrderDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
@@ -169,7 +166,6 @@ public class AccountActivity extends BaseActivity {
                         if (!dataSnapshot1.getKey().equals("Total Price") && !dataSnapshot1.getKey().equals("Status")) {
 
                         }
-
 
                         price.setText(" Rs " + dataSnapshot1.getValue().toString());
 
@@ -190,7 +186,7 @@ public class AccountActivity extends BaseActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
 
         logout_layout.setOnClickListener(new View.OnClickListener() {

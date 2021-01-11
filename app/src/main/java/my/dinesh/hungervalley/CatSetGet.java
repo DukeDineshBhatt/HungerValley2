@@ -1,15 +1,16 @@
 package my.dinesh.hungervalley;
 
 public class CatSetGet {
-    String Name,Image;
+
+    String Image,Name;
 
     public CatSetGet() {
 
     }
 
-    public CatSetGet(String name, String image) {
-        Name = name;
+    public CatSetGet(String image, String name) {
         Image = image;
+        Name = name;
     }
 
     public String getImage() {
@@ -24,7 +25,7 @@ public class CatSetGet {
         return Name;
     }
 
-    public void setName(String Name) {
-        this.Name = Name;
+    public void setName(String name) {
+        Name = name;
     }
 }

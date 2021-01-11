@@ -173,7 +173,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
                                         if (response.body().getMessage().get(0).equals("Message sent successfully")) {
 
-
                                             layout_two.setVisibility(View.VISIBLE);
                                             progressBar.setVisibility(View.GONE);
 

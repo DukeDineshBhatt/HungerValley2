@@ -121,6 +121,5 @@ public class OTP extends AppCompatActivity {
             }
         });
 
-
     }
 }

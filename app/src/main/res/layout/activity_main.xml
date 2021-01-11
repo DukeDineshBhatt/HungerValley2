@@ -33,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="fill_vertical"
+            android:layout_marginBottom="?attr/actionBarSize"
             android:fillViewport="true">
 
             <LinearLayout
@@ -51,16 +52,15 @@
                         android:layout_height="200dp"
                         android:layout_marginTop="56dp" />
 
-                    <TextView
+                   <!-- <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Categories"
                         android:layout_marginLeft="6dp"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
-                        android:textSize="18dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="6dp"
-                        ></TextView>
+                        android:text="Categories"
+                        android:textSize="18dp"></TextView>-->
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/cat"
@@ -69,16 +69,16 @@
                         android:nestedScrollingEnabled="false">
 
                     </androidx.recyclerview.widget.RecyclerView>
+
                     <TextView
+                        style="@style/Base.TextAppearance.AppCompat.Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Restaurants"
                         android:layout_marginLeft="6dp"
-                        style="@style/Base.TextAppearance.AppCompat.Title"
-                        android:textSize="18dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="6dp"
-                        ></TextView>
+                        android:text="Restaurants"
+                        android:textSize="18dp"></TextView>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/upload_list"
@@ -147,7 +147,6 @@
                 </HorizontalScrollView>
             </LinearLayout>
 
-
         </androidx.core.widget.NestedScrollView>
 
         <ProgressBar
@@ -158,14 +157,13 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-
     <include
         android:id="@+id/navigation"
         layout="@layout/element_bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior" />
+        />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

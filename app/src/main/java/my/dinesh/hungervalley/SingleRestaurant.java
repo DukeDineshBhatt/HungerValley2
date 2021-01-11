@@ -916,6 +916,7 @@ public class SingleRestaurant extends AppCompatActivity {
         @Override
         protected void onBindViewHolder(@NonNull myviewholder holder, int position, @NonNull MenuModel model) {
 
+            holder.setIsRecyclable(false);
             holder.name.setText(model.getFoodName());
 
             pricee = Integer.toString(model.getPrice());
@@ -1000,6 +1001,7 @@ public class SingleRestaurant extends AppCompatActivity {
                         }
 
                         Log.d("DINESH KEY", bookskey);
+                        pricee = Integer.toString(model.getPrice());
 
                         holder.add.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -1026,7 +1028,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                             HashMap<String, Object> cartMap = new HashMap<>();
                                             cartMap.put("pName", model.getFoodName());
-                                            cartMap.put("price", Integer.parseInt(pricee) * count);
+                                            cartMap.put("price", model.getPrice());
                                             cartMap.put("quantity", count);
                                             cartMap.put("Type", model.getType());
 
@@ -1046,7 +1048,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                                                                        totalPrice = Integer.parseInt(pricee) + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
+                                                                        totalPrice = model.getPrice() + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
 
                                                                         mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
 
@@ -1141,7 +1143,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                 HashMap<String, Object> cartMap = new HashMap<>();
                                 cartMap.put("pName", model.getFoodName());
-                                cartMap.put("price", Integer.parseInt(pricee) * count);
+                                cartMap.put("price", model.getPrice() * count);
                                 cartMap.put("quantity", count);
                                 cartMap.put("Type", model.getType());
 
@@ -1152,6 +1154,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<Void> task) {
 
                                                 if (task.isSuccessful()) {
+                                                    pricee = Integer.toString(model.getPrice());
 
                                                     mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
 
@@ -1159,7 +1162,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                            totalPrice = Integer.parseInt(pricee) + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
+                                                            totalPrice =  model.getPrice() + Integer.parseInt(dataSnapshot.child("Total price").getValue().toString());
 
                                                             mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
                                                             holder.textCount.setText(String.valueOf(count));
@@ -1205,7 +1208,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                            totalPrice = -(Integer.parseInt(pricee) - Integer.parseInt(dataSnapshot.child("Total price").getValue().toString()));
+                                            totalPrice = -(model.getPrice() - Integer.parseInt(dataSnapshot.child("Total price").getValue().toString()));
 
                                             mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
 
@@ -1231,7 +1234,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                     HashMap<String, Object> cartMap = new HashMap<>();
                                     cartMap.put("pName", model.getFoodName());
-                                    cartMap.put("price", Integer.parseInt(pricee) * count);
+                                    cartMap.put("price",model.getPrice() * count);
                                     cartMap.put("quantity", count);
                                     cartMap.put("Type", model.getType());
 
@@ -1250,7 +1253,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                                totalPrice = -(Integer.parseInt(pricee) - Integer.parseInt(dataSnapshot.child("Total price").getValue().toString()));
+                                                                totalPrice = -(model.getPrice() - Integer.parseInt(dataSnapshot.child("Total price").getValue().toString()));
 
                                                                 mCartDatabase.child("Total price").setValue(String.valueOf(totalPrice));
                                                                 holder.textCount.setText(String.valueOf(count));
@@ -1303,9 +1306,10 @@ public class SingleRestaurant extends AppCompatActivity {
 
                                         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List");
 
+                                        pricee = Integer.toString(model.getPrice());
                                         HashMap<String, Object> cartMap = new HashMap<>();
                                         cartMap.put("pName", model.getFoodName());
-                                        cartMap.put("price", Integer.parseInt(pricee) * count);
+                                        cartMap.put("price", model.getPrice());
                                         cartMap.put("quantity", count);
                                         cartMap.put("Type", model.getType());
 
@@ -1324,7 +1328,7 @@ public class SingleRestaurant extends AppCompatActivity {
                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-                                                                    mCartDatabase.child("Total price").setValue(pricee);
+                                                                    mCartDatabase.child("Total price").setValue(model.getPrice());
 
                                                                     cartLayout.setVisibility(View.VISIBLE);
                                                                     progressBar.setVisibility(View.GONE);
@@ -1557,6 +1561,7 @@ public class SingleRestaurant extends AppCompatActivity {
 
         }
 
+
         @NonNull
         @Override
         public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -1600,36 +1605,6 @@ public class SingleRestaurant extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         adapter.startListening();
-
-    }
-
-    public static class FriendsViewHolder extends RecyclerView.ViewHolder {
-
-        View mView;
-
-        Button buttonInc, buttonDec, add;
-        TextView textCount, price;
-        ImageView type_image;
-        LinearLayout layout_button;
-        LinearLayout main_view;
-
-        public FriendsViewHolder(View itemView) {
-            super(itemView);
-
-            mView = itemView;
-
-            buttonInc = (Button) itemView.findViewById(R.id.btn_add);
-            buttonDec = (Button) itemView.findViewById(R.id.btn_minus);
-            add = (Button) itemView.findViewById(R.id.add);
-            textCount = (TextView) itemView.findViewById(R.id.text);
-            price = (TextView) itemView.findViewById(R.id.price);
-            type_image = (ImageView) itemView.findViewById(R.id.type_image);
-            layout_button = (LinearLayout) itemView.findViewById(R.id.layout_button);
-            main_view = itemView.findViewById(R.id.main_view);
-
-
-        }
-
 
     }
 

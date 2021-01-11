@@ -7,10 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -90,8 +94,8 @@ public class ConfirmOrder extends AppCompatActivity {
 
         mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
 
-        mOrderDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(uId).child(restaurantId);
-        mAdminOrdreDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("Admin View").child(uId).child(restaurantId);
+        mOrderDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(uId);
+        mAdminOrdreDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("Admin View").child(uId);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(uId);
 
@@ -164,7 +168,6 @@ public class ConfirmOrder extends AppCompatActivity {
             }
         });
 
-
         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -178,9 +181,8 @@ public class ConfirmOrder extends AppCompatActivity {
 
                 } else {
 
-
+                    fValue = fValue;
                 }
-
 
             }
 
@@ -231,13 +233,11 @@ public class ConfirmOrder extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
                 mAdminDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                         if (dataSnapshot.child("status").getValue().toString().equals("on")) {
-
 
                             new AlertDialog.Builder(ConfirmOrder.this)
                                     .setMessage("are you sure want to place this Order?")
@@ -249,27 +249,24 @@ public class ConfirmOrder extends AppCompatActivity {
                                             ProgressDialog dialog = ProgressDialog.show(ConfirmOrder.this, "",
                                                     "Please wait...", true);
 
-
                                             progressbar.setVisibility(View.VISIBLE);
+
                                             mCartListDatabase.child(restaurantId).addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-
                                                     for (DataSnapshot uniqueKeySnapshot : dataSnapshot.getChildren()) {
 
                                                         map.put("pName", uniqueKeySnapshot.child("pName").getValue().toString());
                                                         map.put("price", uniqueKeySnapshot.child("price").getValue().toString());
                                                         map.put("quantity", uniqueKeySnapshot.child("quantity").getValue().toString());
+                                                        map.put("type", uniqueKeySnapshot.child("Type").getValue().toString());
+                                                        map.put("res", restaurantId);
 
 
-                                                        mOrderDatabase.child(uniqueKeySnapshot.getKey()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        mOrderDatabase.child("Orders").child(uniqueKeySnapshot.getKey()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
-
-
-                                                                mOrderDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(uId);
-
 
                                                                 map1.put("Total Price", fValue);
                                                                 map1.put("Status", "Pending");
@@ -278,66 +275,100 @@ public class ConfirmOrder extends AppCompatActivity {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> task) {
 
-                                                                    }
-                                                                });
-
-                                                            }
-                                                        });
-
-
-                                                    }
-
-                                                    for (DataSnapshot uniqueKeySnapshot : dataSnapshot.getChildren()) {
-
-                                                        map.put("pName", uniqueKeySnapshot.child("pName").getValue().toString());
-                                                        map.put("price", uniqueKeySnapshot.child("price").getValue().toString());
-                                                        map.put("quantity", uniqueKeySnapshot.child("quantity").getValue().toString());
-
-
-                                                        mAdminOrdreDatabase.child(uniqueKeySnapshot.getKey()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<Void> task) {
-
-
-                                                                map1.put("Total Price", fValue);
-                                                                map1.put("Status", "Pending");
-
-                                                                mOrderDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("Admin View").child(uId);
-                                                                mOrderDatabase.updateChildren(map1).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                    @Override
-                                                                    public void onComplete(@NonNull Task<Void> task) {
-
-
-                                                                        mCartListDatabase.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        mAdminOrdreDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                                                             @Override
-                                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                                                                SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
-                                                                                SharedPreferences.Editor editor1 = mPrefs.edit();
-                                                                                editor1.remove("restaurant");
+                                                                                if (dataSnapshot.hasChildren()) {
 
-                                                                                progressbar.setVisibility(View.GONE);
+                                                                                    mAdminOrdreDatabase.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                            mAdminOrdreDatabase.child("Orders").child(uniqueKeySnapshot.getKey()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                                    mAdminOrdreDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("Admin View").child(uId);
+
+                                                                                                    mAdminOrdreDatabase.updateChildren(map1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                        @Override
+                                                                                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                                            mCartListDatabase.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                                @Override
+                                                                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                                                    SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+                                                                                                                    SharedPreferences.Editor editor1 = mPrefs.edit();
+                                                                                                                    editor1.remove("restaurant");
+                                                                                                                    dialog.dismiss();
+                                                                                                                    progressbar.setVisibility(View.GONE);
+
+                                                                                                                    Toast.makeText(ConfirmOrder.this, "Order has been placed successfully", Toast.LENGTH_SHORT).show();
+
+                                                                                                                    Intent intent = new Intent(ConfirmOrder.this, OrderActivity.class);
+                                                                                                                    startActivity(intent);
+                                                                                                                    finish();
+                                                                                                                }
+                                                                                                            });
+                                                                                                        }
+                                                                                                    });
+
+                                                                                                }
+                                                                                            });
 
 
-                                                                                Toast.makeText(ConfirmOrder.this, "Order has been placed successfully", Toast.LENGTH_LONG).show();
+                                                                                        }
+                                                                                    });
 
-                                                                                Intent intent = new Intent(ConfirmOrder.this, AccountActivity.class);
-                                                                                startActivity(intent);
-                                                                                finish();
+                                                                                } else {
+                                                                                    mAdminOrdreDatabase.child("Orders").child(uniqueKeySnapshot.getKey()).updateChildren(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            mAdminOrdreDatabase = FirebaseDatabase.getInstance().getReference().child("Orders List").child("Admin View").child(uId);
+
+                                                                                            mAdminOrdreDatabase.updateChildren(map1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                @Override
+                                                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                                    mCartListDatabase.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                        @Override
+                                                                                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                                            SharedPreferences mPrefs = getSharedPreferences("myAppPrefs", Context.MODE_PRIVATE);
+                                                                                                            SharedPreferences.Editor editor1 = mPrefs.edit();
+                                                                                                            editor1.remove("restaurant");
+                                                                                                            dialog.dismiss();
+                                                                                                            progressbar.setVisibility(View.GONE);
+
+                                                                                                            Toast.makeText(ConfirmOrder.this, "Order has been placed successfully", Toast.LENGTH_SHORT).show();
+
+                                                                                                            Intent intent = new Intent(ConfirmOrder.this, OrderActivity.class);
+                                                                                                            startActivity(intent);
+                                                                                                            finish();
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+                                                                                            });
+
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
                                                                             }
                                                                         });
 
-
                                                                     }
                                                                 });
-
 
                                                             }
                                                         });
 
                                                     }
-
 
                                                 }
 
