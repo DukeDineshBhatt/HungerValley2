@@ -275,7 +275,7 @@ public class FeedActivity extends AppCompatActivity {
             if (!image.equals("default")) {
 
                 Picasso
-                        .with(mView.getContext())
+                       .get()
                         .load(image)
                         .into(imageView);
 

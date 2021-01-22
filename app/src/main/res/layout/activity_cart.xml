@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
+    android:background="#fff"
     android:layout_height="match_parent">
 
     <RelativeLayout
@@ -23,21 +24,15 @@
 
             <ImageView
                 android:id="@+id/cart_image"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/cart_image" />
 
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Your cart is empty."
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/text"
+                android:id="@+id/empty_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add some yumms to it"
@@ -115,14 +110,14 @@
                         android:weightSum="2">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Item Total"
                             android:textColor="#000000" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center_vertical|right">
@@ -151,14 +146,14 @@
                         android:weightSum="2">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Offers Discount"
                             android:textColor="#388E3C" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center_vertical|right">

@@ -22,6 +22,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -31,9 +34,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import static my.dinesh.hungervalley.Application.getContext;
+
 public class OrderActivity extends BaseActivity {
 
-    CountDownTimer cTimer;
     int flags;
     RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
@@ -46,26 +50,10 @@ public class OrderActivity extends BaseActivity {
 
     private myadapter adapter;
 
-
     TextView timerTextView;
-    long startTime = 0;
+
     Button cancel_order;
-    //runs without a timer by reposting this handler at the end of the runnable
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
 
-        @Override
-        public void run() {
-            long millis = System.currentTimeMillis() - startTime;
-            int seconds = (int) (millis / 1000);
-            int minutes = seconds / 60;
-            seconds = seconds % 60;
-
-            timerTextView.setText(String.format("%d:%02d", minutes, seconds));
-
-            timerHandler.postDelayed(this, 500);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,22 +103,6 @@ public class OrderActivity extends BaseActivity {
 
         timerTextView = (TextView) findViewById(R.id.timerTextView);
 
-       /* b.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Button b = (Button) v;
-                if (b.getText().equals("stop")) {
-                    timerHandler.removeCallbacks(timerRunnable);
-                    b.setText("start");
-                } else {
-                    startTime = System.currentTimeMillis();
-                    timerHandler.postDelayed(timerRunnable, 0);
-                    b.setText("stop");
-                }
-            }
-        });*/
-
 
         FirebaseDatabase.getInstance().getReference().child("Orders List").child("User View").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
@@ -150,27 +122,12 @@ public class OrderActivity extends BaseActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                Picasso
-                                        .with(getApplicationContext())
-                                        .load(dataSnapshot.child("Pending").child("Image").getValue().toString())
-                                        .fit()
+                                Glide.with(getContext()).
+                                        load(dataSnapshot.child("Pending").child("Image").getValue().toString())
+                                        .fitCenter()
                                         .into(pending);
 
                                 txt_pending.setText(dataSnapshot.child("Pending").child("Text").getValue().toString());
-
-                                new CountDownTimer(60000, 1000) {
-                                    public void onTick(long millisUntilFinished) {
-                                        cancel_order.setVisibility(View.VISIBLE);
-                                        timerTextView.setVisibility(View.VISIBLE);
-                                        timerTextView.setText("You Can Cancel the Order in :" + millisUntilFinished / 1000);
-                                    }
-
-                                    public void onFinish() {
-                                        cancel_order.setVisibility(View.GONE);
-                                        timerTextView.setVisibility(View.GONE);
-                                        timerTextView.setText(" ");
-                                    }
-                                }.start();
 
                             }
 
@@ -180,7 +137,7 @@ public class OrderActivity extends BaseActivity {
                             }
                         });
 
-                    } else if (dataSnapshot.child("Status").getValue().toString().equals("onWay")) {
+                    } else if (dataSnapshot.child("Status").getValue().toString().equals("OnWay")) {
 
 
                         layout_pending.setVisibility(View.GONE);
@@ -191,11 +148,10 @@ public class OrderActivity extends BaseActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                Picasso
-                                        .with(getApplicationContext())
-                                        .load(dataSnapshot.child("OnWay").child("Image").getValue().toString())
-                                        .fit()
-                                        .into(pending);
+                                Glide.with(getContext()).
+                                        load(dataSnapshot.child("OnWay").child("Image").getValue().toString())
+                                        .fitCenter()
+                                        .into(onway);
 
                                 txt_onway.setText(dataSnapshot.child("OnWay").child("Text").getValue().toString());
 
@@ -221,9 +177,9 @@ public class OrderActivity extends BaseActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                            Picasso
-                                    .with(getApplicationContext())
-                                    .load(dataSnapshot.child("Empty").child("Image").getValue().toString())
+                            Glide.with(getContext()).
+                                    load(dataSnapshot.child("Empty").child("Image").getValue().toString())
+                                    .fitCenter()
                                     .into(empty);
 
                             txt_empty.setText(dataSnapshot.child("Empty").child("Text").getValue().toString());
@@ -287,13 +243,13 @@ public class OrderActivity extends BaseActivity {
             if (model.getType().equals("Non-Veg")) {
 
                 Picasso
-                        .with(getApplicationContext())
+                        .get()
                         .load(R.drawable.non_veg)
                         .into(holder.type);
             } else {
 
                 Picasso
-                        .with(getApplicationContext())
+                        .get()
                         .load(R.drawable.veg)
                         .into(holder.type);
             }

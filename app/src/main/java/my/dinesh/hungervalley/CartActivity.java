@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import static my.dinesh.hungervalley.Application.getContext;
 
 public class CartActivity extends BaseActivity {
 
@@ -41,8 +44,9 @@ public class CartActivity extends BaseActivity {
     LinearLayout layout_empty;
     RelativeLayout layout;
     String uId, restaurantId;
-    int flags, discount_int, final_total_price, intent_total_price;
-    TextView package_fee, txt_package_fee;
+    int flags, discount_int, final_total_price, intent_total_price, a, f, fValue;
+    TextView package_fee, txt_package_fee, empty_text;
+    ImageView empty_cart_img;
 
     DatabaseReference mCartDatabase, mRestaurantDatabase, mUserDatabase, mAdmindatabase;
     String location;
@@ -69,6 +73,8 @@ public class CartActivity extends BaseActivity {
         banner = (ImageView) findViewById(R.id.banner);
         package_fee = (findViewById(R.id.package_fee));
         txt_package_fee = (findViewById(R.id.txt_package_fees));
+        empty_cart_img = (findViewById(R.id.cart_image));
+        empty_text = (findViewById(R.id.empty_text));
 
         flags = getWindow().getDecorView().getSystemUiVisibility(); // get current flag
         flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;   // add LIGHT_STATUS_BAR to flag
@@ -77,7 +83,6 @@ public class CartActivity extends BaseActivity {
 
         SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
         uId = (shared.getString("user_id", ""));
-
 
         intent_total_price = getIntent().getIntExtra("total_price", 0);
         Log.d("TOTAL", "" + intent_total_price);
@@ -88,6 +93,8 @@ public class CartActivity extends BaseActivity {
         mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View");
         mCartDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
         mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin");
+        mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(restaurantId);
+
 
         mAdmindatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -105,8 +112,6 @@ public class CartActivity extends BaseActivity {
 
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uId);
         mAdmindatabase = FirebaseDatabase.getInstance().getReference().child("Admin").child("Locations");
-
-
 
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -126,7 +131,6 @@ public class CartActivity extends BaseActivity {
                                 if (areaSnapshot.child("areaName").getValue().toString().equals(location)) {
 
                                     package_fee.setText(areaSnapshot.child("areaPrice").getValue().toString());
-
                                     progressBar.setVisibility(View.GONE);
                                 }
 
@@ -154,6 +158,29 @@ public class CartActivity extends BaseActivity {
             }
         });
 
+        restaurant.setText(restaurantId);
+
+
+        mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                String banner_url = dataSnapshot.child("Banner").getValue().toString();
+
+                Picasso
+                        .get()
+                        .load(banner_url)
+                        .into(banner);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -173,36 +200,54 @@ public class CartActivity extends BaseActivity {
                         mCartDatabase.child("Total price").setValue(intent_total_price);
                     }
 
-                   /* mCartDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
+                    mCartListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                            total_price.setText(dataSnapshot.child("Total price").getValue().toString());
 
-                        }
+                            a = Integer.parseInt(total_price.getText().toString());
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            f = a + Integer.parseInt(package_fee.getText().toString());
 
-                        }
-                    });*/
+                            mRestaurantDatabase.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    SharedPreferences shared = getSharedPreferences("myAppPrefs", MODE_PRIVATE);
-                    restaurantId = (shared.getString("restaurant", ""));
+                                    if (dataSnapshot.child("Discount").exists()) {
 
-                    restaurant.setText(restaurantId);
+                                        String s = dataSnapshot.child("Discount").getValue().toString();
+                                        discount_int = Integer.parseInt(s);
 
-                    mRestaurantDatabase = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(restaurantId);
+                                        discount.setText(s);
 
-                    mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        float final_Value = f - discount_int;
 
-                            String banner_url = dataSnapshot.child("Banner").getValue().toString();
+                                        to_pay.setText(String.valueOf(final_Value));
 
-                            Picasso
-                                    .with(getApplicationContext())
-                                    .load(banner_url)
-                                    .into(banner);
+                                    } else {
+
+                                        //to_pay.setText(String.valueOf(f));
+
+                                        to_pay.setText(String.valueOf(a));
+
+
+                                        int a = Integer.parseInt(to_pay.getText().toString());
+
+                                        fValue = a + Integer.parseInt(package_fee.getText().toString());
+
+                                        to_pay.setText(String.valueOf(fValue));
+
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
 
                         }
 
@@ -211,6 +256,7 @@ public class CartActivity extends BaseActivity {
 
                         }
                     });
+
 
                     linearLayoutManager = new LinearLayoutManager(CartActivity.this);
                     recyclerView.setLayoutManager(linearLayoutManager);
@@ -227,55 +273,6 @@ public class CartActivity extends BaseActivity {
                             list = new ArrayList<CartDataSetGet>();
 
                             for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-
-                                mCartListDatabase = FirebaseDatabase.getInstance().getReference().child("Cart List").child("User View").child(uId);
-                                mCartListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                        total_price.setText(dataSnapshot.child("Total price").getValue().toString());
-
-                                        int a = Integer.parseInt(total_price.getText().toString());
-
-                                        int f = a + Integer.parseInt(package_fee.getText().toString());
-
-                                        mRestaurantDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                                if (dataSnapshot.child("Discount").exists()) {
-
-                                                    String s = dataSnapshot.child("Discount").getValue().toString();
-                                                    discount_int = Integer.parseInt(s);
-
-                                                    discount.setText(s);
-
-                                                    float final_Value = f - discount_int;
-
-                                                    to_pay.setText(String.valueOf(final_Value));
-
-                                                } else {
-
-                                                    to_pay.setText(String.valueOf(f));
-
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                                restaurant.setText(restaurantId);
 
                                 CartDataSetGet p = dataSnapshot1.getValue(CartDataSetGet.class);
                                 list.add(p);
@@ -301,6 +298,27 @@ public class CartActivity extends BaseActivity {
                     layout_empty.setVisibility(View.VISIBLE);
                     layout.setVisibility(View.GONE);
 
+                    FirebaseDatabase.getInstance().getReference().child("Main Images").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            Glide.with(getContext()).
+                                    load(dataSnapshot.child("Empty Cart").child("Image").getValue().toString())
+                                    .placeholder(R.drawable.cart_image)
+                                    .fitCenter()
+                                    .into(empty_cart_img);
+
+                            empty_text.setText(dataSnapshot.child("Empty Cart").child("Text").getValue().toString());
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
                 }
 
             }
@@ -312,11 +330,9 @@ public class CartActivity extends BaseActivity {
             }
         });
 
-
         place.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 mUserDatabase.addValueEventListener(new ValueEventListener() {
                     @Override

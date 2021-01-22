@@ -40,13 +40,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         if (profiles.get(position).getType().toString().equals("Non-Veg")) {
 
             Picasso
-                    .with(context.getApplicationContext())
+                    .get()
                     .load(R.drawable.non_veg)
                     .into(holder.type);
         } else {
 
             Picasso
-                    .with(context.getApplicationContext())
+                    .get()
                     .load(R.drawable.veg)
                     .into(holder.type);
         }
